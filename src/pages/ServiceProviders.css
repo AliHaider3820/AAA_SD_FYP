@@ -75,6 +75,10 @@
   margin-bottom: 1rem;
 }
 
+.rating-number {
+  color: #3c87d2;
+}
+
 .stars {
   color: #f1c40f;
   margin-right: 0.5rem;

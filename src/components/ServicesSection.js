@@ -56,7 +56,7 @@ const ServicesSection = () => {
         },
         { 
             id: 6, 
-            name: 'Locksmith', 
+            name: 'Home Cleaning', 
             icon: 'fas fa-home',
             image: 'images/home.jpg',
             bgColor: '#ECEFF1',

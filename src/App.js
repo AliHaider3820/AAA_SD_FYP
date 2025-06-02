@@ -1,24 +1,25 @@
+import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { createContext, useState, useContext, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import Home from './pages/Home';
 import Services from './pages/Services';
+import ServiceProviders from './pages/ServiceProviders';
+import ProviderProfile from './pages/ProviderProfile';
 import Contact from './pages/Contact';
 import About from './pages/About';
+import Login from './pages/Login';
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import Login from './pages/Login';
-import Home from './pages/Home';
 
 export const AuthContext = createContext(null);
-
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useContext(AuthContext);
   const location = useLocation();
 
   if (!isAuthenticated) {
-    
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -51,7 +52,6 @@ function App() {
   }, []);
 
   const login = (username, password) => {
-    
     if (username === 'AliHK' && password === 'password') {
       const userData = { username };
       setIsAuthenticated(true);
@@ -68,16 +68,24 @@ function App() {
     localStorage.removeItem('user');
   };
 
+  const authContextValue = {
+    isAuthenticated,
+    setIsAuthenticated,
+    user,
+    setUser,
+    login,
+    logout
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={authContextValue}>
       <Router>
         <div className="app">
           <Header />
-          
           <main className="main-content">
             <Routes>
               <Route path="/login" element={
@@ -95,6 +103,16 @@ function App() {
                   <Services />
                 </ProtectedRoute>
               } />
+              <Route path="/service-providers/:serviceId" element={
+                <ProtectedRoute>
+                  <ServiceProviders />
+                </ProtectedRoute>
+              } />
+              <Route path="/provider/:serviceId/:providerId" element={
+                <ProtectedRoute>
+                  <ProviderProfile />
+                </ProtectedRoute>
+              } />
               <Route path="/contact" element={
                 <ProtectedRoute>
                   <Contact />
@@ -107,7 +125,6 @@ function App() {
               } />
             </Routes>
           </main>
-
           <Footer />
         </div>
       </Router>

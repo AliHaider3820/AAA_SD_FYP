@@ -2,6 +2,7 @@ import React from 'react';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Link } from 'react-router-dom';
 import './ServicesSection.css';
 import CategoryCard from './CategoryCard';
 import ServiceCard from './ServiceCard';
@@ -28,21 +29,21 @@ const ServicesSection = () => {
         },
         { 
             id: 3, 
-            name: 'Painting', 
-            icon: 'fas fa-paint-roller',
-            image: 'images/painting.jpg',
-            bgColor: '#E8F5E9',
-            gradient: 'linear-gradient(135deg, #E8F5E9 0%, #A5D6A7 100%)',
-            iconColor: '#388E3C'
-        },
-        { 
-            id: 4, 
             name: 'Food', 
             icon: 'fas fa-burger',
             image: 'images/food.jpg',
             bgColor: '#FFF3E0',
             gradient: 'linear-gradient(135deg, #FFF3E0 0%, #FFB74D 100%)',
             iconColor: '#F57C00'
+        },
+        { 
+            id: 4, 
+            name: 'Painting', 
+            icon: 'fas fa-paint-roller',
+            image: 'images/painting.jpg',
+            bgColor: '#E8F5E9',
+            gradient: 'linear-gradient(135deg, #E8F5E9 0%, #A5D6A7 100%)',
+            iconColor: '#388E3C'
         },
         { 
             id: 5, 
@@ -55,9 +56,9 @@ const ServicesSection = () => {
         },
         { 
             id: 6, 
-            name: 'AC Services', 
-            icon: 'fas fa-toolbox',
-            image: 'images/ac.jpg',
+            name: 'Locksmith', 
+            icon: 'fas fa-home',
+            image: 'images/home.jpg',
             bgColor: '#ECEFF1',
             gradient: 'linear-gradient(135deg, #ECEFF1 0%, #B0BEC5 100%)',
             iconColor: '#455A64'
@@ -160,6 +161,12 @@ const ServicesSection = () => {
                             <CategoryCard key={category.id} category={category} />
                         ))}
                     </Slider>
+                </div>
+                
+                <div className="see-more-container">
+                    <Link to="/services" className="see-more-link">
+                        View All Categories →
+                    </Link>
                 </div>
 
                 <h1>Featured Services</h1>

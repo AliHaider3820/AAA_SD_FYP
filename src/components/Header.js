@@ -60,11 +60,6 @@ const Header = () => {
                 <source srcSet={`${process.env.PUBLIC_URL}/AAA.jpeg`} type="image/jpeg" />
                 <img src={`${process.env.PUBLIC_URL}/AAA.jpeg`} alt="AAA Logo" className="logo-img" loading="eager" />
               </picture>
-
-              {/* <div className="logo-text-container">
-                <span className="logo-text">AAA</span>
-                <span className="logo-subtitle">Services Directory</span>
-              </div> */}
             </Link>
           </div>
 

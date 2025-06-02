@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Services.css';
 
 const Services = () => {
@@ -38,6 +38,14 @@ const Services = () => {
     },
     {
       id: 5,
+      title: 'Transport Services',
+      description: 'Reliable transportation and logistics solutions',
+      icon: '🚗',
+      category: 'Transport',
+      tags: ['Delivery', 'Moving', 'Logistics', 'Transport']
+    },
+    {
+      id: 6,
       title: 'Home Cleaning',
       description: 'Thorough home and office cleaning services',
       icon: '🧹',
@@ -45,7 +53,7 @@ const Services = () => {
       tags: ['Deep Clean', 'Regular', 'Commercial', 'Residential']
     },
     {
-      id: 6,
+      id: 7,
       title: 'Gardening & Lawn',
       description: 'Professional garden maintenance and landscaping',
       icon: '🌿',
@@ -53,22 +61,28 @@ const Services = () => {
       tags: ['Maintenance', 'Landscaping', 'Design', 'Care']
     },
     {
-      id: 7,
-      title: 'Home Repairs',
-      description: 'General home repair and maintenance services',
-      icon: '🔨',
-      category: 'Repairs',
-      tags: ['Maintenance', 'Fixes', 'Installation', 'Emergency']
+      id: 8,
+      title: 'Home Repair',
+      description: 'General home repairs and maintenance services',
+      icon: '🔧',
+      category: 'Repair',
+      tags: ['Maintenance', 'Repairs', 'Installation', 'Renovation']
     },
     {
-      id: 8,
-      title: 'Moving & Transport',
-      description: 'Professional moving and transportation services',
-      icon: '🚛',
-      category: 'Moving',
-      tags: ['Relocation', 'Packing', 'Storage', 'Furniture Moving']
+      id: 9,
+      title: 'Locksmith Services',
+      description: 'Professional locksmith services for all your security needs',
+      icon: '🔐',
+      category: 'Security',
+      tags: ['Emergency', 'Lockout', 'Key Duplication', 'Security']
     }
   ];
+
+  const navigate = useNavigate();
+
+  const handleServiceClick = (serviceId) => {
+    navigate(`/service-providers/${serviceId}`);
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -121,18 +135,21 @@ const Services = () => {
             <option value="Painting">Painting</option>
             <option value="Cleaning">Cleaning</option>
             <option value="Gardening">Gardening</option>
-            <option value="Repairs">Repairs</option>
-            <option value="Moving">Moving</option>
+            <option value="Repair">Repair</option>
+            <option value="Transport">Transport</option>
+            <option value="Locksmith">Locksmith</option>
           </select>
         </div>
       </div>
 
       <div className="services-grid">
         {filteredServices.map(service => (
-          <div key={service.id} className="service-card">
-            <div className="service-icon">
-              {service.icon}
-            </div>
+          <div
+            key={service.id}
+            className="service-card"
+            onClick={() => handleServiceClick(service.id)}
+          >
+            <div className="service-icon">{service.icon}</div>
             <h3>{service.title}</h3>
             <p>{service.description}</p>
             <div className="service-meta">

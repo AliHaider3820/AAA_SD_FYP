@@ -240,3 +240,47 @@ html {
   .categories-container .slick-slide > div {
     height: 100%;
   }
+
+  .see-more-container {
+    text-align: center;
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  .see-more-link {
+    display: inline-block;
+    padding: 0.8rem 1.8rem;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 2px solid #3498db;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    background-color: transparent;
+  }
+
+  .see-more-link:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+  }
+
+  .see-more-link:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.2);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .see-more-link {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.95rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .see-more-link {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+  }

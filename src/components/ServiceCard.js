@@ -1,9 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ServiceCard.css';
 
 const ServiceCard = ({ service }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/service-providers/${service.id}`);
+  };
+
   return (
-    <div className="service-card">
+    <div className="service-card" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
       <div className="service-image" style={{ backgroundImage: `url(${service.image})` }}>
         {service.badge && <span className="service-badge">{service.badge}</span>}
       </div>
@@ -32,7 +39,10 @@ const ServiceCard = ({ service }) => {
           </div>
           <div className="service-price">
             <span>{service.price}</span>
-            <button className="book-button">Book Now</button>
+            <button className="book-button" onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/service-providers/${service.id}`);
+            }}>Book Now</button>
           </div>
         </div>
       </div>

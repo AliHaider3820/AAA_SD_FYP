@@ -15,7 +15,22 @@ const ServiceProviders = () => {
   }, [providers]);
 
   useEffect(() => {
-    setServiceTitle(location.state?.serviceName || 'Service Providers');
+    const serviceTitles = {
+      1: "Plumbing Services",
+      2: "Electrical Work",
+      3: "Food Catering",
+      4: "Home Painting",
+      5: "Transport Services",
+      6: "Home Cleaning",
+      7: "Gardening & Lawn",
+      8: "Home Repair",
+      9: "Locksmith Services",
+      10: "Online Courses",
+      11: "Food Delivery"
+    };
+
+    // Set the service title based on the serviceId
+    setServiceTitle(serviceTitles[serviceId] || 'Service Providers');
     
     const fetchProviders = () => {
       // const serviceCategories = {
@@ -153,7 +168,7 @@ const ServiceProviders = () => {
             experience: "15 years",
             phone: "+1234567900",
             location: "West District, 7km away",
-            image: "https://images.unsplash.com/photo-1559847844-5315695dadae?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+            image: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
             description: "Luxury catering for special occasions",
             views: 1567
           },
@@ -444,6 +459,98 @@ const ServiceProviders = () => {
             description: "Comprehensive locksmith services with the highest level of security expertise",
             views: 2000
           }
+        ],
+        10: [ // Online Courses
+          {
+            id: 37,
+            name: "EduTech Masters",
+            rating: 4.8,
+            experience: "8 years",
+            phone: "+1234568000",
+            location: "Online",
+            image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            description: "Comprehensive online courses in technology, business, and creative skills. Learn at your own pace with expert instructors.",
+            views: 2450
+          },
+          {
+            id: 38,
+            name: "SkillForge Academy",
+            rating: 4.9,
+            experience: "10 years",
+            phone: "+1234568001",
+            location: "Online",
+            image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            description: "Professional certification courses with hands-on projects and career support. Join our community of 100,000+ learners.",
+            views: 3200
+          },
+          {
+            id: 39,
+            name: "CodeMaster Pro",
+            rating: 4.9,
+            experience: "12 years",
+            phone: "+1234568002",
+            location: "Online",
+            image: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            description: "Specialized coding bootcamps and workshops. Learn in-demand tech skills from industry experts.",
+            views: 2890
+          },
+          {
+            id: 40,
+            name: "Business Edge Online",
+            rating: 4.7,
+            experience: "15 years",
+            phone: "+1234568003",
+            location: "Online",
+            image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            description: "Executive education and professional development courses for business leaders and entrepreneurs.",
+            views: 2100
+          }
+        ],
+        11: [ // Food Delivery
+          {
+            id: 41,
+            name: "QuickBite Express",
+            rating: 4.6,
+            experience: "5 years",
+            phone: "+1234569000",
+            location: "Citywide",
+            image: "https://media.istockphoto.com/id/1522377968/photo/smiling-black-male-customer-receiving-a-food-delivery.webp?a=1&b=1&s=612x612&w=0&k=20&c=fIfwBgpX5wYddFeZoBDeXHABGEO9im3ZP4CvJpjZXe4=",
+            description: "Fast food delivery from your favorite local restaurants. Order online for quick delivery to your doorstep.",
+            views: 3800
+          },
+          {
+            id: 42,
+            name: "Delivery Hero",
+            rating: 4.8,
+            experience: "7 years",
+            phone: "+1234569001",
+            location: "Citywide",
+            image: "https://images.unsplash.com/photo-1598546937882-4fa25fa29418?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Zm9vZCUyMGRlbGl2ZXJ5JTIwc2VydmljZXxlbnwwfHwwfHx8MA%3D%3D",
+            description: "Premium food delivery service featuring top-rated restaurants and exclusive menu items.",
+            views: 4200
+          },
+          {
+            id: 43,
+            name: "HealthyEats",
+            rating: 4.7,
+            experience: "6 years",
+            phone: "+1234569002",
+            location: "Citywide",
+            image: "https://media.istockphoto.com/id/1314632869/photo/close-up-of-woman-packing-food-for-delivery.webp?a=1&b=1&s=612x612&w=0&k=20&c=L5iKcOqzKF_NfbMss2ZS0kZwcSIyCcTBqs6wtTvjs6A=",
+            description: "Nutritious meals delivered fresh to your door. Perfect for health-conscious individuals and busy professionals.",
+            views: 3100
+          },
+          {
+            id: 44,
+            name: "Midnight Munchies",
+            rating: 4.5,
+            experience: "4 years",
+            phone: "+1234569003",
+            location: "Citywide",
+            image: "https://images.unsplash.com/photo-1716167236455-839c9f19539a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWlkbmlnaHQlMjBkZWxpdmVyeSUyMHNlcnZpY2V8ZW58MHx8MHx8fDA%3D",
+            description: "Late-night food delivery when you need it most. Open until 4 AM with a wide selection of restaurants.",
+            views: 2900
+          }
         ]
       };
 
@@ -482,7 +589,9 @@ const ServiceProviders = () => {
         <i className="fas fa-arrow-left"></i>
         Back to Services
       </button>
-      <h1>{serviceTitle} Providers</h1>
+      <h1 style={{ marginBottom: '30px', color: '#2c3e50', fontSize: '2rem' }}>
+        {serviceTitle} Providers
+      </h1>
       <div className="providers-grid">
         {providers.map((provider) => (
           <div 

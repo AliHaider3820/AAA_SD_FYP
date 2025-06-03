@@ -75,6 +75,22 @@ const Services = () => {
       icon: '🔐',
       category: 'Security',
       tags: ['Emergency', 'Lockout', 'Key Duplication', 'Security']
+    },
+    {
+      id: 10,
+      title: 'Online Courses',
+      description: 'Comprehensive online learning for various skills and subjects',
+      icon: '🎓',
+      category: 'Education',
+      tags: ['E-learning', 'Certification', 'Workshops', 'Tutorials']
+    },
+    {
+      id: 11,
+      title: 'Food Delivery',
+      description: 'Fast and reliable food delivery from your favorite restaurants',
+      icon: '🍔',
+      category: 'Food',
+      tags: ['Delivery', 'Takeout', 'Meal Kits', 'Groceries']
     }
   ];
 
@@ -137,7 +153,8 @@ const Services = () => {
             <option value="Gardening">Gardening</option>
             <option value="Repair">Repair</option>
             <option value="Transport">Transport</option>
-            <option value="Locksmith">Locksmith</option>
+            <option value="Security">Security</option>
+            <option value="Education">Education</option>
           </select>
         </div>
       </div>

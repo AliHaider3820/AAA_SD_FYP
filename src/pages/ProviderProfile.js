@@ -419,6 +419,101 @@ const mockProviders = {
       description: "Comprehensive locksmith services with the highest level of security expertise",
       services: ["Lock Installation", "Lock Repair", "Key Duplication", "Safe Installation"]
     }
+  ],
+  
+  10: [// Online Courses (ID: 10)
+    {
+      id: 37,
+      name: "EduTech Masters",
+      rating: 4.9,
+      experience: "8 years",
+      phone: "+1234567915",
+      location: "Online",
+      image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Learn to code with our comprehensive online courses. From beginner to advanced levels, we've got you covered.",
+      services: ["Web Development", "Mobile App Development", "Data Science", "Machine Learning"]
+    },
+    {
+      id: 38,
+      name: "SkillForge Academy",
+      rating: 4.8,
+      experience: "6 years",
+      phone: "+1234567916",
+      location: "Online",
+      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Master digital arts with our expert-led courses. Perfect for aspiring designers and creative professionals.",
+      services: ["Graphic Design", "UI/UX Design", "3D Modeling", "Digital Illustration"]
+    },
+    {
+      id: 39,
+      name: "Language Masters",
+      rating: 4.7,
+      experience: "10 years",
+      phone: "+1234567917",
+      location: "Online",
+      image: "https://media.istockphoto.com/id/1342027604/photo/arab-male-english-teacher-explaining-rules-near-blackboard-standing-with-clipboard-smiling-at.webp?a=1&b=1&s=612x612&w=0&k=20&c=_f5ngZMFcUtMb-BZsxBlZlTkaVOat50h5zkjCY0CULM=",
+      description: "Advance your career with our business and management courses. Learn from industry experts at your own pace.",
+      services: ["English", "Spanish", "French", "Mandarin", "German"]
+    },
+    {
+      id: 40,
+      name: "Business Edge Online",
+      rating: 4.9,
+      experience: "12 years",
+      phone: "+1234567918",
+      location: "Online",
+      image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Learn a new language with our interactive online courses. Speak with confidence in no time.",
+      services: ["Business Management", "Digital Marketing", "Entrepreneurship", "Project Management"]
+    }
+  ],
+  
+  // Food Delivery (ID: 11)
+  11: [
+    {
+      id: 41,
+      name: "QuickBite Express",
+      rating: 4.7,
+      experience: "5 years",
+      phone: "+1234567919",
+      location: "Downtown, 3km away",
+      image: "https://media.istockphoto.com/id/1522377968/photo/smiling-black-male-customer-receiving-a-food-delivery.webp?a=1&b=1&s=612x612&w=0&k=20&c=fIfwBgpX5wYddFeZoBDeXHABGEO9im3ZP4CvJpjZXe4=",
+      description: "Fast and reliable food delivery service. Your favorite meals delivered to your doorstep.",
+      services: ["Fast Food", "Burgers", "Pizza", "Sandwiches", "Beverages"]
+    },
+    {
+      id: 42,
+      name: "Delivery Hero",
+      rating: 4.8,
+      experience: "4 years",
+      phone: "+1234567920",
+      location: "West District, 4km away",
+      image: "https://images.unsplash.com/photo-1598546937882-4fa25fa29418?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Zm9vZCUyMGRlbGl2ZXJ5JTIwc2VydmljZXxlbnwwfHwwfHx8MA%3D%3D",
+      description: "Nutritious and delicious meals prepared fresh daily. Eat well without the hassle.",
+      services: ["Salads", "Vegan Meals", "Gluten-Free Options", "Detox Juices"]
+    },
+    {
+      id: 43,
+      name: "Healthy Eats",
+      rating: 4.9,
+      experience: "7 years",
+      phone: "+1234567921",
+      location: "East End, 5km away",
+      image: "https://media.istockphoto.com/id/1314632869/photo/close-up-of-woman-packing-food-for-delivery.webp?a=1&b=1&s=612x612&w=0&k=20&c=L5iKcOqzKF_NfbMss2ZS0kZwcSIyCcTBqs6wtTvjs6A=",
+      description: "Authentic Asian cuisine delivered to your door. Experience the flavors of Asia at home.",
+      services: ["Sushi", "Chinese", "Thai", "Indian", "Korean BBQ"]
+    },
+    {
+      id: 44,
+      name: "Midnight Munchies",
+      rating: 4.8,
+      experience: "3 years",
+      phone: "+1234567922",
+      location: "Central District, 2km away",
+      image: "https://images.unsplash.com/photo-1716167236455-839c9f19539a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWlkbmlnaHQlMjBkZWxpdmVyeSUyMHNlcnZpY2V8ZW58MHx8MHx8fDA%3D",
+      description: "Indulge in our delicious desserts. Perfect for any occasion or just because.",
+      services: ["Cakes", "Cupcakes", "Cookies", "Ice Cream", "Pastries"]
+    }
   ]
 };
 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './ServiceProviders.css';
@@ -33,17 +34,6 @@ const ServiceProviders = () => {
     setServiceTitle(serviceTitles[serviceId] || 'Service Providers');
     
     const fetchProviders = () => {
-      // const serviceCategories = {
-      //   1: "Plumbing Services",
-      //   2: "Electrical Work",
-      //   3: "Food Catering",
-      //   4: "Home Painting",
-      //   5: "Transport Services",
-      //   6: "Home Cleaning",
-      //   7: "Gardening & Lawn",
-      //   8: "Home Repair",
-      //   9: "Locksmith Services"
-      // };
 
       const mockProviders = {
         1: [ // Plumbing
@@ -485,12 +475,12 @@ const ServiceProviders = () => {
           },
           {
             id: 39,
-            name: "CodeMaster Pro",
+            name: "Language Masters",
             rating: 4.9,
             experience: "12 years",
             phone: "+1234568002",
             location: "Online",
-            image: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            image: "https://media.istockphoto.com/id/1342027604/photo/arab-male-english-teacher-explaining-rules-near-blackboard-standing-with-clipboard-smiling-at.webp?a=1&b=1&s=612x612&w=0&k=20&c=_f5ngZMFcUtMb-BZsxBlZlTkaVOat50h5zkjCY0CULM=",
             description: "Specialized coding bootcamps and workshops. Learn in-demand tech skills from industry experts.",
             views: 2890
           },

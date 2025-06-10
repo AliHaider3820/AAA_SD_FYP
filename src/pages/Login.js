@@ -1,20 +1,42 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../App';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (isSubmitting && !error) {
+      navigate('/');
+    }
+  }, [isSubmitting, error, navigate]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (login(username, password)) {
-      navigate('/');
+    const success = login(formData.username, formData.password);
+    
+    if (success) {
+      setFormData({ username: '', password: '' });
+      setError('');
+      setIsSubmitting(true);
     } else {
       setError('Invalid credentials');
+      setFormData(prev => ({ ...prev, password: '' }));
     }
   };
 
@@ -24,24 +46,29 @@ function Login() {
         <h2>Login</h2>
         {error && <div className="error">{error}</div>}
         <div className="form-group">
-          <label>Username:</label>
+          <label>Username</label>
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
             required
           />
         </div>
         <div className="form-group">
-          <label>Password:</label>
+          <label>Password</label>
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" className="login-button">Login</button>
+        <p className="signup-link">
+          Don't have an account? <Link to="/Signup">Sign Up</Link>
+        </p>
       </form>
     </div>
   );

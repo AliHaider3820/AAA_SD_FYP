@@ -10,40 +10,19 @@ import ProviderProfile from './pages/ProviderProfile';
 import Contact from './pages/Contact';
 import About from './pages/About';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 export const AuthContext = createContext(null);
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useContext(AuthContext);
-  const location = useLocation();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  return children;
-};
-
-const PublicRoute = ({ children }) => {
-  const { isAuthenticated } = useContext(AuthContext);
-  const location = useLocation();
-
-  if (isAuthenticated) {
-    return <Navigate to={location.state?.from?.pathname || '/'} replace />;
-  }
-
-  return children;
-};
-
-function App() {
+const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
+    const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
       setIsAuthenticated(true);
@@ -51,21 +30,48 @@ function App() {
     setLoading(false);
   }, []);
 
-  const login = (username, password) => {
-    if (username === 'AliHK' && password === 'password') {
-      const userData = { username };
+  const login = (email, password) => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (user) {
       setIsAuthenticated(true);
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(user);
+      localStorage.setItem('currentUser', JSON.stringify(user));
       return true;
     }
     return false;
   };
 
+  const register = (userData) => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    if (users.some(u => u.email === userData.email)) {
+      return { success: false, message: 'User already exists' };
+    }
+    
+    const newUser = {
+      id: Date.now(),
+      name: userData.name,
+      email: userData.email,
+      password: userData.password,
+      location: userData.location
+    };
+    
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    setIsAuthenticated(true);
+    setUser(newUser);
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    
+    return { success: true, user: newUser };
+  };
+
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
-    localStorage.removeItem('user');
+    localStorage.removeItem('currentUser');
   };
 
   const authContextValue = {
@@ -74,7 +80,8 @@ function App() {
     user,
     setUser,
     login,
-    logout
+    logout,
+    register
   };
 
   if (loading) {
@@ -88,40 +95,17 @@ function App() {
           <Header />
           <main className="main-content">
             <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/service-providers/:serviceId" element={<ServiceProviders />} />
+              <Route path="/provider/:serviceId/:providerId" element={<ProviderProfile />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<About />} />
               <Route path="/login" element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
+                isAuthenticated ? <Navigate to="/" /> : <Login />
               } />
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              } />
-              <Route path="/services" element={
-                <ProtectedRoute>
-                  <Services />
-                </ProtectedRoute>
-              } />
-              <Route path="/service-providers/:serviceId" element={
-                <ProtectedRoute>
-                  <ServiceProviders />
-                </ProtectedRoute>
-              } />
-              <Route path="/provider/:serviceId/:providerId" element={
-                <ProtectedRoute>
-                  <ProviderProfile />
-                </ProtectedRoute>
-              } />
-              <Route path="/contact" element={
-                <ProtectedRoute>
-                  <Contact />
-                </ProtectedRoute>
-              } />
-              <Route path="/about" element={
-                <ProtectedRoute>
-                  <About />
-                </ProtectedRoute>
+              <Route path="/signup" element={
+                isAuthenticated ? <Navigate to="/" /> : <Signup />
               } />
             </Routes>
           </main>
@@ -130,6 +114,6 @@ function App() {
       </Router>
     </AuthContext.Provider>
   );
-}
+};
 
 export default App;

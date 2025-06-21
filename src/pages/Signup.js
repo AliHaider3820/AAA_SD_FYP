@@ -1,7 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../App';
-import { useNavigate } from 'react-router-dom';
-
 function Signup() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -14,8 +12,6 @@ function Signup() {
   });
   const [error, setError] = useState('');
   const { register } = useContext(AuthContext);
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -63,22 +59,36 @@ function Signup() {
       return;
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     try {
-      const result = await register({
+      const result = register({
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         password: formData.password,
         location: formData.location
       });
-      
+
       if (result.success) {
-        navigate('/');
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          location: ''
+        });
+        setError('');
+        window.location.href = '/';
       } else {
         setError(result.message || 'Registration failed');
       }
-    } catch (error) {
+    } catch (err) {
       setError('An error occurred during registration');
-      console.error('Registration error:', error);
+      console.error('Registration error:', err);
     }
   };
 
@@ -175,12 +185,12 @@ function Signup() {
         
         <div className="form-navigation">
           {step > 1 && (
-            <button type="button" onClick={prevStep} className="nav-button">
+            <button type="button" onClick={prevStep} className="nav-button"style={{margin: '10px'}}>
               Back
             </button>
           )}
           {step < 3 ? (
-            <button type="button" onClick={nextStep} className="nav-button primary" style={{margin: '10px'}}>
+            <button type="button" onClick={nextStep} className="nav-button primary" >
               Next
             </button>
           ) : (
@@ -191,7 +201,7 @@ function Signup() {
         </div>
         
         <p className="login-link">
-          Already have an account? <a href="/login">Log in</a>
+          Already have an account? <a className='nav-link' href="/login">Log in</a>
         </p>
       </form>
     </div>

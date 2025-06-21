@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../App';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import './Header.css';
@@ -11,7 +11,6 @@ const Header = () => {
   const profileRef = useRef(null);
   const overlayRef = useRef(null);
   const { isAuthenticated, logout, user } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -28,20 +27,11 @@ const Header = () => {
   const handleLogout = () => {
     logout();
     setShowProfileDropdown(false);
-    navigate('/');
     closeMobileMenu();
+    window.location.href = '/';
   };
 
-  // Get user initials for avatar
-  const getUserInitials = () => {
-    if (!user?.name) return 'U';
-    return user.name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
-  };
+  
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -89,67 +79,82 @@ const Header = () => {
   return (
     <header className="header">
       <nav className="main-nav">
-        <div className="top-nav">
+        <div className="header-container">
+          {/* Logo on the left */}
           <div className="logo-container">
             <Link to="/" className="logo-link" onClick={closeMobileMenu}>
               <picture className="logo-picture">
-                <source srcSet={`${process.env.PUBLIC_URL}/LOGO-AAA.jpeg`} type="image/jpeg" />
-                <img src={`${process.env.PUBLIC_URL}/LOGO-AAA.jpeg`} alt="AAA Logo" className="logo-img" loading="eager" />
+                <source srcSet={`${process.env.PUBLIC_URL}/favicon_transbg.png`} type="image/png" />
+                <img src={`${process.env.PUBLIC_URL}/favicon_transbg.png`} alt="AAA Logo" className="logo-img" loading="eager" />
               </picture>
             </Link>
           </div>
 
+          {/* Navigation links in center */}
           <div className="nav-links">
             <Link to="/" className="nav-link" onClick={closeMobileMenu}>Home</Link>
             <Link to="/services" className="nav-link" onClick={closeMobileMenu}>Services</Link>
             <Link to="/about" className="nav-link" onClick={closeMobileMenu}>About Us</Link>
             <Link to="/contact" className="nav-link" onClick={closeMobileMenu}>Contact</Link>
-            
-            {/* Always show auth buttons when not logged in */}
-            {!isAuthenticated ? (
-              <div className="auth-buttons">
-                <Link to="/login" className="nav-link login-btn" onClick={closeMobileMenu}>Login</Link>
-                <Link to="/signup" className="nav-link signup-btn" onClick={closeMobileMenu}>Sign Up Free</Link>
-              </div>
-            ) : (
+          </div>
+
+          {/* Right side - profile and hamburger */}
+          <div className="header-right">
+            {isAuthenticated ? (
               <div className="profile-container" ref={profileRef}>
-                <button className="profile-button" onClick={toggleProfileDropdown}>
-                  <div className="profile-avatar">
-                    {user?.profileImage ? (
-                      <img src={user.profileImage} alt="Profile" className="profile-image" />
-                    ) : (
-                      <span className="profile-initials">{getUserInitials()}</span>
-                    )}
-                  </div>
-                  <span className="profile-name">{user?.name?.split(' ')[0] || 'User'}</span>
+                <button 
+                  className="profile-btn" 
+                  onClick={toggleProfileDropdown}
+                  aria-expanded={showProfileDropdown}
+                  aria-label="Profile menu"
+                >
+                  {user?.profilePicture ? (
+                    <img 
+                      src={user.profilePicture} 
+                      alt="Profile" 
+                      className="profile-pic"
+                    />
+                  ) : (
+                    <FaUserCircle className="profile-icon" />
+                  )}
+                  <span className="profile-name">My Profile</span>
                 </button>
+                
                 {showProfileDropdown && (
-                  <div className="profile-dropdown">
-                    <Link to="/profile" className="dropdown-item" onClick={() => setShowProfileDropdown(false)}>
-                      <FaUserCircle className="dropdown-icon" />
-                      My Profile
+                  <div className="dropdown-menu">
+                    <Link 
+                      to="/profile" 
+                      className="dropdown-item" 
+                      onClick={() => setShowProfileDropdown(false)}
+                    >
+                      <FaUserCircle /> My Profile
                     </Link>
-                    <button className="dropdown-item" onClick={handleLogout}>
-                      <FaSignOutAlt className="dropdown-icon" />
-                      Logout
+                    <button 
+                      className="dropdown-item" 
+                      onClick={handleLogout}
+                    >
+                      <FaSignOutAlt /> Logout
                     </button>
                   </div>
                 )}
               </div>
+            ) : (
+              <div className="auth-buttons">
+                <Link to="/login" className="login-btn" onClick={closeMobileMenu}>Log In</Link>
+                <Link to="/signup" className="signup-btn" onClick={closeMobileMenu}>Sign Up</Link>
+              </div>
             )}
-          </div>
-
-          {/* Hamburger Menu Button */}
-          <div className="hamburger-menu">
-            <button
-              className={`hamburger-btn ${isMobileMenuOpen ? 'active' : ''}`}
-              onClick={toggleMobileMenu}
-              aria-label="Toggle mobile navigation"
-            >
-              <span className="bar"></span>
-              <span className="bar"></span>
-              <span className="bar"></span>
-            </button>
+            <div className="hamburger-menu">
+              <button
+                className={`hamburger-btn ${isMobileMenuOpen ? 'active' : ''}`}
+                onClick={toggleMobileMenu}
+                aria-label="Toggle mobile navigation"
+              >
+                <span className="bar"></span>
+                <span className="bar"></span>
+                <span className="bar"></span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -160,11 +165,14 @@ const Header = () => {
               <div className="logo-container">
                 <Link to="/" className="logo-link" onClick={closeMobileMenu}>
                   <picture className="logo-picture">
-                    <source srcSet={`${process.env.PUBLIC_URL}/AAA.jpeg`} type="image/jpeg" />
-                    <img src={`${process.env.PUBLIC_URL}/AAA.jpeg`} alt="AAA Logo" className="logo-img" loading="eager" />
+                    <source srcSet={`${process.env.PUBLIC_URL}/favicon_transbg.png`} type="image/png" />
+                    <img src={`${process.env.PUBLIC_URL}/favicon_transbg.png`} alt="AAA Logo" className="logo-img" loading="eager" />
                   </picture>
                 </Link>
               </div>
+              <button className="close-btn" onClick={closeMobileMenu}>
+                ×
+              </button>
             </div>
             <div className="mobile-nav-links">
               <Link to="/" className="nav-link" onClick={closeMobileMenu}>Home</Link>
@@ -175,12 +183,12 @@ const Header = () => {
               {isAuthenticated ? (
                 <>
                   <Link to="/profile" className="nav-link" onClick={closeMobileMenu}>My Profile</Link>
-                  <button onClick={handleLogout} className="nav-link logout-btn">Logout</button>
+                  <button onClick={handleLogout} className="nav-link">Logout</button>
                 </>
               ) : (
                 <div className="mobile-auth-buttons">
-                  <Link to="/login" className="nav-link login-btn" onClick={closeMobileMenu}>Login</Link>
-                  <Link to="/signup" className="nav-link signup-btn" onClick={closeMobileMenu}>Sign Up Free</Link>
+                  <Link to="/login" className="nav-link" onClick={closeMobileMenu}>Login</Link>
+                  <Link to="/signup" className="nav-link" onClick={closeMobileMenu}>Sign Up Free</Link>
                 </div>
               )}
             </div>

@@ -2,6 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './ProviderProfile.css';
 
+// Mock reviews data structure
+const mockReviews = {
+  1: [
+    { id: 1, name: 'Sarah Johnson', rating: 5, comment: 'Excellent service! The team was professional and completed the job efficiently. Highly recommend!', date: '2023-10-15' },
+    { id: 2, name: 'Michael Chen', rating: 4, comment: 'Good work overall, but there was a slight delay in completing the project. The quality of work was great though.', date: '2023-10-10' },
+  ],
+  2: [
+    { id: 3, name: 'Alex Turner', rating: 5, comment: 'Outstanding service! Will definitely hire again.', date: '2023-10-18' },
+  ],
+  // Add more reviews for other providers as needed
+};
+
 // Mock data - in a real app, this would come from an API
 const mockProviders = {
   // Plumbing (ID: 1)
@@ -93,7 +105,7 @@ const mockProviders = {
       experience: "20 years",
       phone: "+1234567897",
       location: "Northside, 9km away",
-      image: "https://plus.unsplash.com/premium_photo-1716824502431-b93e3756a6aa?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGVsZWN0cmljJTIwd29ya3xlbnwwfHwwfHx8MA%3D%3D",
+      image: "https://plus.unsplash.com/premium_photo-1716824502431-b93e3756a6aa?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGVsZWN0cmljJTIwd29ya3xlbnwwfHwwfHx8fHww",
       description: "Comprehensive electrical services for homes and businesses",
       services: ["Electrical Inspections", "Wiring Upgrades", "Circuit Breaker Services", "Emergency Electrical Repairs"]
     }
@@ -266,7 +278,7 @@ const mockProviders = {
       experience: "15 years",
       phone: "+1234567912",
       location: "West District, 6km away",
-      image: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MXwxNzMwOTQwfHxlbnwwfHx8fHw%3D",
+      image: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MXwxNzMwOTQwfHxlbnwwfHwwfHx8fDA%3D",
       description: "Commercial and residential cleaning solutions",
       services: ["One-Time Cleaning", "Regular Cleaning", "Special Event Cleaning", "Construction Cleaning"]
     },
@@ -440,7 +452,7 @@ const mockProviders = {
       experience: "6 years",
       phone: "+1234567916",
       location: "Online",
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MXwxNzMwOTQwfHxlbnwwfHwwfHx8MA%3D%3D",
       description: "Master digital arts with our expert-led courses. Perfect for aspiring designers and creative professionals.",
       services: ["Graphic Design", "UI/UX Design", "3D Modeling", "Digital Illustration"]
     },
@@ -520,32 +532,107 @@ const mockProviders = {
 const ProviderProfile = () => {
   const { serviceId, providerId } = useParams();
   const [provider, setProvider] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [newReview, setNewReview] = useState({ name: '', rating: 5, comment: '' });
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulate API call
-    const fetchProvider = () => {
-      try {
-        const serviceProviders = mockProviders[serviceId] || [];
-        const selectedProvider = serviceProviders.find(p => p.id === parseInt(providerId));
+    const fetchData = () => {
+      // Ensure providerId is treated as a string for consistent comparison
+      const providerIdStr = String(providerId);
+      const serviceProviders = mockProviders[serviceId] || [];
+      const selectedProvider = serviceProviders.find(p => p.id === parseInt(providerIdStr));
+      
+      if (selectedProvider) {
+        setProvider(selectedProvider);
         
-        if (selectedProvider) {
-          setProvider(selectedProvider);
+        // Load reviews from localStorage
+        const savedReviews = localStorage.getItem('providerReviews');
+        if (savedReviews) {
+          try {
+            const allReviews = JSON.parse(savedReviews);
+            // Ensure we're using the same string key when accessing the reviews
+            const providerReviews = allReviews[providerIdStr] || [];
+            console.log('Loaded reviews:', providerReviews);
+            setReviews(providerReviews);
+          } catch (error) {
+            console.error('Error parsing saved reviews:', error);
+            setReviews([]);
+          }
         } else {
-          // Redirect to services page if provider not found
-          navigate('/services');
+          // Fallback to mock reviews if no localStorage data
+          console.log('No saved reviews, using mock data');
+          setReviews(mockReviews[providerIdStr] || []);
         }
-      } catch (error) {
-        console.error('Error fetching provider:', error);
+      } else {
+        console.log('Provider not found, redirecting...');
         navigate('/services');
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
-
-    fetchProvider();
+    
+    fetchData();
   }, [serviceId, providerId, navigate]);
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (!newReview.name.trim() || !newReview.comment.trim()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    try {
+      // Ensure providerId is treated as a string for consistent storage
+      const providerIdStr = String(providerId);
+      
+      const review = {
+        id: Date.now(),
+        name: newReview.name.trim(),
+        rating: parseInt(newReview.rating, 10),
+        comment: newReview.comment.trim(),
+        date: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      };
+      
+      // Get existing reviews from localStorage or initialize empty object
+      const savedReviews = JSON.parse(localStorage.getItem('providerReviews') || '{}');
+      
+      // Add new review to the provider's reviews using the string key
+      const providerReviews = savedReviews[providerIdStr] 
+        ? [...savedReviews[providerIdStr], review] 
+        : [review];
+      
+      // Save back to localStorage with the string key
+      savedReviews[providerIdStr] = providerReviews;
+      localStorage.setItem('providerReviews', JSON.stringify(savedReviews));
+      
+      console.log('Saved reviews:', savedReviews);
+      
+      // Update state
+      setReviews(providerReviews);
+      setNewReview({ name: '', rating: 5, comment: '' });
+      setShowReviewForm(false);
+      
+      // Show success message
+      alert('Thank you for your review!');
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('There was an error submitting your review. Please try again.');
+    }
+  };
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewReview(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -581,13 +668,25 @@ const ProviderProfile = () => {
         <div className="profile-info">
           <h1>{provider.name}</h1>
           <div className="rating">
-            {[...Array(5)].map((_, i) => (
-              <i 
-                key={i} 
-                className={`fas fa-star ${i < Math.floor(provider.rating) ? 'filled' : ''}`}
-              ></i>
-            ))}
-            <span className="rating-text">{provider.rating} ({Math.floor(provider.rating * 10)} reviews)</span>
+            <div className="stars">
+              {[...Array(5)].map((_, i) => {
+                const starValue = i + 1;
+                const isFilled = i < Math.floor(provider.rating);
+                const isHalfFilled = !isFilled && (provider.rating - i > 0.5);
+                
+                return (
+                  <span key={i} className={`star ${isFilled ? 'filled' : ''} ${isHalfFilled ? 'half-filled' : ''}`}>
+                    <i className="fas fa-star"></i>
+                    {isHalfFilled && <i className="fas fa-star-half-alt half-star"></i>}
+                  </span>
+                );
+              })}
+            </div>
+            <span className="rating-text">
+              <strong>{provider.rating.toFixed(1)}</strong> 
+              <span className="divider">•</span> 
+              <span className="review-count">{Math.floor(provider.rating * 10)} reviews</span>
+            </span>
           </div>
           
           <div className="experience">
@@ -634,35 +733,96 @@ const ProviderProfile = () => {
         </div>
         
         <div className="reviews-section">
-          <h3>Customer Reviews</h3>
-          <div className="review">
-            <div className="review-header">
-              <span className="reviewer">Sarah Johnson</span>
-              <span className="review-rating">
-                {[...Array(5)].map((_, i) => (
-                  <i key={i} className="fas fa-star filled"></i>
-                ))}
-              </span>
-            </div>
-            <p className="review-text">
-              Excellent service! The team was professional and completed the job efficiently. Highly recommend!
-            </p>
+          <div className="reviews-header">
+            <h3>Customer Reviews</h3>
+            <button 
+              className="add-review-btn" 
+              onClick={() => setShowReviewForm(!showReviewForm)}
+            >
+              {showReviewForm ? 'Cancel' : 'Write a Review'}
+            </button>
           </div>
           
-          <div className="review">
-            <div className="review-header">
-              <span className="reviewer">Michael Chen</span>
-              <span className="review-rating">
-                {[...Array(4)].map((_, i) => (
-                  <i key={i} className="fas fa-star filled"></i>
-                ))}
-                <i className="far fa-star"></i>
-              </span>
+          {showReviewForm && (
+            <form className="review-form" onSubmit={handleReviewSubmit}>
+              <h4>Write a Review</h4>
+              <div className="form-group">
+                <label htmlFor="name">Your Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={newReview.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter your name"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Your Rating</label>
+                <div className="rating-input">
+                  <div className="stars-container">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <React.Fragment key={star}>
+                        <input
+                          type="radio"
+                          id={`star${star}`}
+                          name="rating"
+                          value={star}
+                          checked={parseInt(newReview.rating) === star}
+                          onChange={handleInputChange}
+                        />
+                        <label htmlFor={`star${star}`} className="star">
+                          <i className={`fas fa-star ${star <= newReview.rating ? 'filled' : ''}`}></i>
+                        </label>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                  <div className="rating-value">
+                    {newReview.rating ? `You rated: ${newReview.rating} star${newReview.rating > 1 ? 's' : ''}` : 'Select a rating'}
+                  </div>
+                </div>
+              </div>
+              <div className="form-group">
+                <label htmlFor="comment">Your Review</label>
+                <textarea
+                  id="comment"
+                  name="comment"
+                  value={newReview.comment}
+                  onChange={handleInputChange}
+                  placeholder="Share your experience with this provider..."
+                  rows="4"
+                  required
+                ></textarea>
+              </div>
+              <button type="submit" className="submit-review-btn">
+                <i className="fas fa-paper-plane"></i> Submit Review
+              </button>
+            </form>
+          )}
+          {reviews.length > 0 ? (
+            <div className="reviews-list">
+              {reviews.map((review) => (
+                <div key={review.id} className="review">
+                  <div className="review-header">
+                    <span className="reviewer">{review.name}</span>
+                    <span className="review-date">{review.date}</span>
+                    <span className="review-rating">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <i 
+                          key={star} 
+                          className={`fas fa-star ${star <= review.rating ? 'filled' : 'empty'}`}
+                        ></i>
+                      ))}
+                    </span>
+                  </div>
+                  <p className="review-text">{review.comment}</p>
+                </div>
+              ))}
             </div>
-            <p className="review-text">
-              Good work overall, but there was a slight delay in completing the project. The quality of work was great though.
-            </p>
-          </div>
+          ) : (
+            <p className="no-reviews">No reviews yet. Be the first to review!</p>
+          )}
         </div>
       </div>
     </div>

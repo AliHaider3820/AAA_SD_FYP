@@ -17,6 +17,7 @@ const ReviewPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [reviewerName, setReviewerName] = useState('');
   
   // Service categories mapping
   const serviceCategories = {
@@ -90,6 +91,12 @@ const ReviewPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // Validate name
+    if (!reviewerName.trim()) {
+      setError('Please enter your name.');
+      return;
+    }
+    
     // Validate review length
     if (review.length < 45) {
       setError('Review must be at least 45 characters long.');
@@ -111,6 +118,7 @@ const ReviewPage = () => {
     // Create review object
     const newReview = {
       id: Date.now(),
+      reviewerName: reviewerName.trim(),
       providerId: selectedProvider.id,
       providerName: selectedProvider.name,
       providerImage: selectedProvider.image,
@@ -121,13 +129,41 @@ const ReviewPage = () => {
     };
     
     try {
-      // Save to localStorage
-      const reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
-      localStorage.setItem('reviews', JSON.stringify([...reviews, newReview]));
+      // Get existing reviews from localStorage or initialize empty object
+      const savedReviews = JSON.parse(localStorage.getItem('providerReviews') || '{}');
+      
+      // Format the review to match ProviderProfile.js format
+      const formattedReview = {
+        id: Date.now(),
+        name: reviewerName.trim(),
+        rating: rating,
+        comment: review,
+        date: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      };
+      
+      // Get existing reviews for this provider or initialize empty array
+      const providerKey = String(selectedProvider.id);
+      const providerReviews = savedReviews[providerKey] || [];
+      
+      // Add new review
+      const updatedReviews = [...providerReviews, formattedReview];
+      
+      // Save back to localStorage
+      savedReviews[providerKey] = updatedReviews;
+      localStorage.setItem('providerReviews', JSON.stringify(savedReviews));
+      
+      // Also save to the reviews list for the review page
+      const allReviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+      localStorage.setItem('reviews', JSON.stringify([...allReviews, newReview]));
       
       // Show success message and reset form
       setSuccess('Thank you for your review!');
       setRating(0);
+      setReviewerName('');
       setReview('');
       setSelectedProvider('');
       setError('');
@@ -255,6 +291,19 @@ const ReviewPage = () => {
               )}
             </div>
           )}
+          
+          <div className="form-group">
+            <label htmlFor="reviewerName">Your Name</label>
+            <input
+              type="text"
+              id="reviewerName"
+              value={reviewerName}
+              onChange={(e) => setReviewerName(e.target.value)}
+              className="form-control"
+              placeholder="Enter your name"
+              required
+            />
+          </div>
           
           <div className="form-group">
             <label>Your Rating</label>

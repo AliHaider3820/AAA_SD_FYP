@@ -11,6 +11,7 @@ import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
+import ReviewPage from './pages/ReviewPage';
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -118,15 +119,19 @@ const AppContent = () => {
             <Route path="/contact" element={<Contact />} />
             <Route 
               path="/login" 
-              element={isAuthenticated ? <Navigate to="/" /> : <Login />} 
+              element={!isAuthenticated ? <Login onLogin={login} /> : <Navigate to="/" />} 
             />
             <Route 
               path="/signup" 
-              element={isAuthenticated ? <Navigate to="/" /> : <Signup />} 
+              element={!isAuthenticated ? <Signup onRegister={register} /> : <Navigate to="/" />} 
             />
             <Route 
               path="/profile" 
               element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} 
+            />
+            <Route 
+              path="/reviews" 
+              element={isAuthenticated ? <ReviewPage /> : <Navigate to="/login" state={{ from: '/reviews' }} />} 
             />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

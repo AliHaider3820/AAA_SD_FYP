@@ -100,6 +100,9 @@ const Header = () => {
 
           {/* Right side - profile and hamburger */}
           <div className="header-right">
+            {isAuthenticated && (
+              <Link to="/reviews" className="nav-link" onClick={closeMobileMenu}>Write a Review</Link>
+            )}
             {isAuthenticated ? (
               <div className="profile-container" ref={profileRef}>
                 <button 
@@ -165,7 +168,7 @@ const Header = () => {
               <div className="logo-container">
                 <Link to="/" className="logo-link" onClick={closeMobileMenu}>
                   <picture className="logo-picture">
-                    <source srcSet={`${process.env.PUBLIC_URL}/favicon_transbg.png`} type="image/png" />
+                    <source srcSet={`${process.env.PUBLIC_URL}/favicon_transbg.png`} type="/png" />
                     <img src={`${process.env.PUBLIC_URL}/favicon_transbg.png`} alt="AAA Logo" className="logo-img" loading="eager" />
                   </picture>
                 </Link>
@@ -182,6 +185,7 @@ const Header = () => {
               
               {isAuthenticated ? (
                 <>
+                  <Link to="/reviews" className="nav-link" onClick={closeMobileMenu}>Write a Review</Link>
                   <Link to="/profile" className="nav-link" onClick={closeMobileMenu}>My Profile</Link>
                   <button onClick={handleLogout} className="nav-link">Logout</button>
                 </>

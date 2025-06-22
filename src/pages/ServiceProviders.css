@@ -1,51 +1,83 @@
 .service-providers-container {
-  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .service-providers-container h2 {
   text-align: center;
   color: #2c3e50;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
+  margin-bottom: 30px;
+  font-size: 2.2rem;
+  font-weight: 600;
 }
 
 .loading {
   text-align: center;
-  padding: 2rem;
-  font-size: 1.2rem;
+  padding: 40px;
+  font-size: 1.1rem;
   color: #666;
 }
 
 .providers-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
 }
 
 .provider-card {
-  background: white;
-  border-radius: 10px;
+  background: #fff;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   height: 100%;
+  border: 1px solid #eaeaea;
+}
+
+.provider-stats {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  color: #555;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rating i {
+  color: #f1c40f;
+  font-size: 1rem;
+}
+
+.rating-number {
+  margin-left: 0.25rem;
+  color: #3c87d2;
+  font-weight: 500;
 }
 
 .provider-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .provider-image-container {
   width: 100%;
-  height: 250px;
+  height: 200px;
   overflow: hidden;
+  position: relative;
 }
 
 .provider-image {

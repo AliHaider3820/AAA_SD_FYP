@@ -3,19 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../App';
 import './Login.css';
 
-function ClientLogin() {
+const ServiceProviderLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useContext(AuthContext);
-
-  // Redirect if already logged in
-  if (isAuthenticated) {
-    navigate('/');
-  }
+  const { login } = useContext(AuthContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,20 +25,17 @@ function ClientLogin() {
     setError('');
     
     try {
-      // Attempt to login as a client (not a service provider)
-      const success = await login(formData.email, formData.password, false);
+      // Attempt to login as a service provider
+      const success = await login(formData.email, formData.password, true);
       
       if (success) {
-        // Check if the logged-in user is not a service provider
+        // Check if the logged-in user is a service provider
         const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        if (!currentUser.isServiceProvider) {
-          // Check for redirect URL in query params
-          const searchParams = new URLSearchParams(window.location.search);
-          const redirectTo = searchParams.get('redirect') || '/';
-          navigate(redirectTo);
+        if (currentUser.isServiceProvider) {
+          navigate('/business-profile');
         } else {
-          // If it's a service provider, show error and log them out
-          setError('Please use the service provider login.');
+          // If not a service provider, show error and log them out
+          setError('Please use the client login or register as a service provider.');
           localStorage.removeItem('currentUser');
           window.location.reload();
         }
@@ -59,7 +51,7 @@ function ClientLogin() {
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
-        <h2>Client Login</h2>
+        <h2>Service Provider Login</h2>
         
         {error && <div className="error-message">{error}</div>}
         
@@ -93,19 +85,19 @@ function ClientLogin() {
         </div>
         
         <button type="submit" className="login-button">
-          Login as Client
+          Login as Service Provider
         </button>
         
         <p className="signup-link">
-          Don't have an account? <Link to="/signup" className="nav-link">Sign Up</Link>
+          Don't have a business account? <Link to="/ServiceProviderSignup" className="nav-link">Register Here</Link>
         </p>
         
         <p className="switch-login">
-          <Link to="/service-provider-login" className="nav-link">Login as Service Provider</Link>
+          <Link to="/login" className="nav-link">Login as Client</Link>
         </p>
       </form>
     </div>
   );
-}
+};
 
-export default ClientLogin;
+export default ServiceProviderLogin;

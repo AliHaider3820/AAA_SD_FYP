@@ -99,6 +99,38 @@
     color: #3498db;
   }
   
+  /* Become Provider Button */
+  .become-provider-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .become-provider-btn:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .become-provider-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Mobile-specific styles */
+  .mobile-only {
+    display: none;
+  }
+  
   .signup-btn {
     padding: 0.5rem 1.5rem;
     border-radius: 4px;
@@ -895,11 +927,12 @@
 
   /* Login Button */
   .login-btn {
-    text-decoration: none;
-    color: #2c3e50;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1.5rem;
     border-radius: 4px;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
     transition: all 0.3s ease;
   }
 
@@ -924,9 +957,8 @@
   }
 
   .signup-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(41, 128, 185, 0.4);
-    background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+    color: #3498db;
+    background-color: rgba(52, 152, 219, 0.1);
   }
 
   .signup-btn:active {

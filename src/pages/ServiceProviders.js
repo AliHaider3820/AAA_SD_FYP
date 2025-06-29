@@ -15,24 +15,32 @@ const ServiceProviders = () => {
     console.log('Current providers:', providers);
   }, [providers]);
 
-  useEffect(() => {
+  // Get service title based on ID
+  const getServiceTitle = (id) => {
     const serviceTitles = {
       1: "Plumbing Services",
       2: "Electrical Work",
       3: "Food Catering",
-      4: "Home Painting",
+      4: "Home Cleaning",
       5: "Transport Services",
-      6: "Home Cleaning",
+      6: "Home Maintenance",
       7: "Gardening & Lawn",
-      8: "Home Repair",
+      8: "Pest Control",
       9: "Locksmith Services",
-      10: "Online Courses",
-      11: "Food Delivery"
+      10: "Moving & Storage",
+      11: "Food Delivery",
+      12: "Personal Training"
     };
+    return serviceTitles[id] || 'Service Providers';
+  };
 
-    // Set the service title based on the serviceId
-    setServiceTitle(serviceTitles[serviceId] || 'Service Providers');
-    
+  // Set the service title based on the serviceId
+  useEffect(() => {
+    setServiceTitle(getServiceTitle(parseInt(serviceId)));
+  }, [serviceId]);
+
+  // Fetch and combine providers
+  useEffect(() => {
     const fetchProviders = () => {
 
       const mockProviders = {
@@ -544,7 +552,33 @@ const ServiceProviders = () => {
         ]
       };
 
-      setProviders(mockProviders[serviceId] || []);
+      // Get mock providers for the current service
+      const mockServiceProviders = mockProviders[serviceId] || [];
+      
+      // Get registered providers from localStorage
+      try {
+        const registeredProviders = JSON.parse(localStorage.getItem('serviceProviders') || '[]');
+        
+        // Filter providers for the current service category
+        const filteredRegisteredProviders = registeredProviders.filter(
+          provider => parseInt(provider.serviceCategory) === parseInt(serviceId)
+        );
+        
+        // Combine and deduplicate providers by ID
+        const combinedProviders = [
+          ...mockServiceProviders,
+          ...filteredRegisteredProviders.filter(
+            registered => !mockServiceProviders.some(mock => mock.id === registered.id)
+          )
+        ];
+        
+        console.log('Combined providers:', combinedProviders);
+        setProviders(combinedProviders);
+      } catch (error) {
+        console.error('Error loading registered providers:', error);
+        setProviders(mockServiceProviders);
+      }
+      
       setLoading(false);
     };
 
@@ -598,9 +632,14 @@ const ServiceProviders = () => {
           >
             <div className="provider-image-container">
               <img 
-                src={provider.image} 
+                src={provider.profilePicture || provider.image || 'https://placehold.co/150x150?text=No+Image'} 
                 alt={provider.name} 
                 className="provider-image"
+                onError={(e) => {
+                  // Fallback to a placeholder if the image fails to load
+                  e.target.onerror = null;
+                  e.target.src = 'https://placehold.co/150x150?text=No+Image';
+                }}
               />
             </div>
             <div className="provider-info">

@@ -1,8 +1,10 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
+import BusinessDropdown from './BusinessDropdown';
 import './Header.css';
+import './BusinessDropdown.css';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -24,11 +26,17 @@ const Header = () => {
     setShowProfileDropdown(!showProfileDropdown);
   };
 
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    logout();
+    const success = logout();
     setShowProfileDropdown(false);
     closeMobileMenu();
-    window.location.href = '/';
+    
+    if (success) {
+      // Use React Router's navigate instead of window.location
+      navigate('/', { replace: true });
+    }
   };
 
   
@@ -83,10 +91,23 @@ const Header = () => {
           {/* Logo on the left */}
           <div className="logo-container">
             <Link to="/" className="logo-link" onClick={closeMobileMenu}>
-              <picture className="logo-picture">
-                <source srcSet={`${process.env.PUBLIC_URL}/favicon_transbg.png`} type="image/png" />
-                <img src={`${process.env.PUBLIC_URL}/favicon_transbg.png`} alt="AAA Logo" className="logo-img" loading="eager" />
-              </picture>
+              <img 
+                src={process.env.PUBLIC_URL + '/favicon_transbg.png'} 
+                alt="AAA Logo" 
+                className="logo-img" 
+                loading="eager"
+                style={{
+                  height: '50px',
+                  width: 'auto',
+                  maxWidth: '200px',
+                  display: 'block'
+                }}
+                onError={(e) => {
+                  console.log('Failed to load logo from:', e.target.src);
+                  // Fallback to a different path if needed
+                  e.target.src = '/favicon_darkbg.png';
+                }}
+              />
             </Link>
           </div>
 
@@ -100,9 +121,13 @@ const Header = () => {
 
           {/* Right side - profile and hamburger */}
           <div className="header-right">
-            {isAuthenticated && (
-              <Link to="/reviews" className="nav-link" onClick={closeMobileMenu}>Write a Review</Link>
-            )}
+            <BusinessDropdown 
+              isAuthenticated={isAuthenticated} 
+              user={user} 
+              onLogout={handleLogout}
+            />
+            <Link to="/reviews" className="nav-link">Write a Review</Link>
+            
             {isAuthenticated ? (
               <div className="profile-container" ref={profileRef}>
                 <button 
@@ -143,7 +168,7 @@ const Header = () => {
               </div>
             ) : (
               <div className="auth-buttons">
-                <Link to="/login" className="login-btn" onClick={closeMobileMenu}>Log In</Link>
+                <Link to="/login" className="login-btn" onClick={closeMobileMenu}>Login</Link>
                 <Link to="/signup" className="signup-btn" onClick={closeMobileMenu}>Sign Up</Link>
               </div>
             )}

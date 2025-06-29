@@ -4,8 +4,14 @@ import { FaUser, FaEnvelope, FaMapMarkerAlt, FaEdit, FaCamera } from 'react-icon
 import './Profile.css';
 
 const Profile = () => {
-  const { user, setUser } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  const user = authContext?.user;
   const [profilePic, setProfilePic] = useState(user?.profilePicture || null);
+  
+  // Ensure setUser is available from context
+  const setUser = authContext?.setUser || (() => {
+    console.warn('setUser is not available in AuthContext');
+  });
 
   if (!user) {
     return (
@@ -17,26 +23,57 @@ const Profile = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
+    if (!file) return;
+
+    // Get current user data first
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser?.id) {
+      console.error('No user is currently logged in');
+      return;
+    }
+
+    const reader = new FileReader();
+    
+    reader.onloadend = () => {
+      try {
         const newProfilePic = reader.result;
+        
+        // Update local state
         setProfilePic(newProfilePic);
         
-        // Update user in context and localStorage
-        const updatedUser = { ...user, profilePicture: newProfilePic };
-        setUser(updatedUser);
+        // Create updated user object
+        const updatedUser = { 
+          ...currentUser, 
+          profilePicture: newProfilePic,
+          hasProfilePicture: true
+        };
+        
+        // Update context if setUser is available
+        if (typeof setUser === 'function') {
+          setUser(updatedUser);
+        } else {
+          console.warn('setUser is not a function, updating localStorage only');
+        }
         
         // Update in localStorage
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         const updatedUsers = users.map(u => 
-          u.email === user.email ? { ...u, profilePicture: newProfilePic } : u
+          u.id === currentUser.id ? updatedUser : u
         );
+        
         localStorage.setItem('users', JSON.stringify(updatedUsers));
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      };
-      reader.readAsDataURL(file);
-    }
+        
+      } catch (error) {
+        console.error('Error updating profile picture:', error);
+      }
+    };
+    
+    reader.onerror = () => {
+      console.error('Failed to read the image file');
+    };
+    
+    reader.readAsDataURL(file);
   };
 
   return (

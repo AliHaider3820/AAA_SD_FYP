@@ -5,8 +5,19 @@ import './CategoryCard.css';
 const CategoryCard = ({ category }) => {
   const navigate = useNavigate();
 
+  // Map category names to service IDs based on the serviceTitles in ServiceProviders.js
+  const categoryToServiceId = {
+    'Plumbering': 1,
+    'Electrition': 2,
+    'Food': 3,
+    'Painting': 4,
+    'Transportation': 5,
+    'Home Cleaning': 6
+  };
+
   const handleClick = () => {
-    navigate(`/service-providers/${category.id}`, { state: { serviceName: category.name } });
+    const serviceId = categoryToServiceId[category.name] || 1; // Default to 1 if not found
+    navigate(`/service-providers/${serviceId}`);
   };
 
   return (

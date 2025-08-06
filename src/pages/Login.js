@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../App';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 function ClientLogin() {
@@ -9,13 +9,17 @@ function ClientLogin() {
     password: ''
   });
   const [error, setError] = useState('');
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useContext(AuthContext);
+  const location = useLocation();
 
   // Redirect if already logged in
-  if (isAuthenticated) {
-    navigate('/');
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirectTo = location.state?.from?.pathname || '/';
+      navigate(redirectTo, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,24 +34,9 @@ function ClientLogin() {
     setError('');
     
     try {
-      // Attempt to login as a client (not a service provider)
-      const success = await login(formData.email, formData.password, false);
+      const success = await login(formData.email, formData.password, 'client');
       
-      if (success) {
-        // Check if the logged-in user is not a service provider
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        if (!currentUser.isServiceProvider) {
-          // Check for redirect URL in query params
-          const searchParams = new URLSearchParams(window.location.search);
-          const redirectTo = searchParams.get('redirect') || '/';
-          navigate(redirectTo);
-        } else {
-          // If it's a service provider, show error and log them out
-          setError('Please use the service provider login.');
-          localStorage.removeItem('currentUser');
-          window.location.reload();
-        }
-      } else {
+      if (!success) {
         setError('Invalid email or password');
       }
     } catch (err) {
@@ -101,7 +90,7 @@ function ClientLogin() {
         </p>
         
         <p className="switch-login">
-          <Link to="/service-provider-login" className="nav-link">Login as Service Provider</Link>
+          <Link to="/business/login" className="nav-link">Login as Business</Link>
         </p>
       </form>
     </div>

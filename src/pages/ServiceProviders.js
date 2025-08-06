@@ -585,7 +585,12 @@ const ServiceProviders = () => {
     fetchProviders();
   }, [serviceId, location.state]);
 
-  const handleProviderClick = (provider) => {
+  const handleProviderClick = (provider, e) => {
+    // Prevent navigation if the click was on a button or link inside the card
+    if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'A' || e.target.closest('a')) {
+      return;
+    }
+    // Navigate to provider profile with both serviceId and providerId
     navigate(`/provider/${serviceId}/${provider.id}`);
   };
 
@@ -621,12 +626,15 @@ const ServiceProviders = () => {
           <div 
             key={provider.id} 
             className="provider-card" 
-            onClick={() => handleProviderClick(provider)}
+            onClick={(e) => handleProviderClick(provider, e)}
             style={{ cursor: 'pointer' }}
             tabIndex={0}
+            role="button"
+            aria-label={`View ${provider.name}'s profile`}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                handleProviderClick(provider);
+                e.preventDefault();
+                handleProviderClick(provider, e);
               }
             }}
           >

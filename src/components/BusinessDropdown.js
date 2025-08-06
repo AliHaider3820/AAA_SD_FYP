@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaBackspace, FaBackward, FaBuilding, FaSignInAlt, FaSignLanguage, FaSignOutAlt } from 'react-icons/fa';
-import { AuthContext } from '../App';
+import { FaSignInAlt, FaSignOutAlt, FaStore, FaUser } from 'react-icons/fa';
+import { IoBusiness } from 'react-icons/io5';
+import { MdDashboard } from 'react-icons/md';
+import { AuthContext } from '../context/AuthContext';
 import './BusinessDropdown.css';
-import { FaBabyCarriage, FaBackwardFast, FaBackwardStep } from 'react-icons/fa6';
 
-const BusinessDropdown = ({ isAuthenticated }) => {
+const BusinessDropdown = ({ isAuthenticated, user, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -13,13 +14,18 @@ const BusinessDropdown = ({ isAuthenticated }) => {
   const [hasBusiness, setHasBusiness] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated && authUser) {
-      // Check if user has a business
-      const providers = JSON.parse(localStorage.getItem('serviceProviders') || '[]');
-      const userBusiness = providers.find(p => p.userId === authUser.id);
-      setHasBusiness(!!userBusiness);
-    }
-  }, [isAuthenticated, authUser]);
+    const checkBusiness = () => {
+      const currentUser = user || authUser;
+      if (isAuthenticated && currentUser) {
+        // Check if user has a business
+        const providers = JSON.parse(localStorage.getItem('serviceProviders') || '[]');
+        const userBusiness = providers.find(p => p.userId === currentUser.id);
+        setHasBusiness(!!userBusiness);
+      }
+    };
+    
+    checkBusiness();
+  }, [isAuthenticated, user, authUser]);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -66,27 +72,40 @@ const BusinessDropdown = ({ isAuthenticated }) => {
           {isAuthenticated ? (
             <>
               {hasBusiness ? (
-                <button 
-                  className="dropdown-item"
-                  onClick={() => handleItemClick('/business-profile')}
-                >
-                  <FaBuilding className="dropdown-icon" />
-                  My Business Profile
-                </button>
+                <>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => handleItemClick('/business/dashboard')}
+                  >
+                    <MdDashboard className="dropdown-icon" />
+                    Business Dashboard
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => handleItemClick('/business/profile')}
+                  >
+                    <FaStore className="dropdown-icon" />
+                    My Business Profile
+                  </button>
+                </>
               ) : (
-                <button 
+                <Link 
+                  to="/service-provider-signup"
                   className="dropdown-item"
-                  onClick={() => handleItemClick('/service-provider-signup')}
+                  onClick={closeDropdown}
                 >
-                  <FaBuilding className="dropdown-icon" />
+                  <IoBusiness className="dropdown-icon" />
                   Register Your Business
-                </button>
+                </Link>
               )}
               <div className="dropdown-divider"></div>
               <button 
                 className="dropdown-item"
                 onClick={() => {
                   closeDropdown();
+                  if (onLogout) {
+                    onLogout();
+                  }
                   // Clear user session
                   localStorage.removeItem('currentUser');
                   // Redirect to home page
@@ -100,13 +119,27 @@ const BusinessDropdown = ({ isAuthenticated }) => {
               </button>
             </>
           ) : (
-            <button 
-              className="dropdown-item"
-              onClick={() => handleItemClick('/login')}
-            >
-              <FaSignInAlt className="dropdown-icon" />
-              Login / Register
-            </button>
+            <>
+              <Link 
+                to="/business/login" 
+                className="dropdown-item"
+                onClick={closeDropdown}
+              >
+                <FaSignInAlt className="dropdown-icon" />
+                Business Login
+              </Link>
+              <div className="dropdown-divider"></div>
+              <Link 
+                to="/service-provider-signup" 
+                className="dropdown-item"
+                onClick={closeDropdown}
+              >
+                <IoBusiness className="dropdown-icon" />
+                Register Business
+              </Link>
+              <div className="dropdown-divider"></div>
+             
+            </>
           )}
         </div>
       )}

@@ -3,6 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Services.css';
 
 const Services = () => {
+  const navigate = useNavigate();
+  
+  const handleServiceClick = (serviceId) => {
+    navigate(`/service-providers/${serviceId}`);
+  };
+
   const services = [
     {
       id: 1,
@@ -94,12 +100,6 @@ const Services = () => {
     }
   ];
 
-  const navigate = useNavigate();
-
-  const handleServiceClick = (serviceId) => {
-    navigate(`/service-providers/${serviceId}`);
-  };
-
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
 
@@ -161,21 +161,23 @@ const Services = () => {
 
       <div className="services-grid">
         {filteredServices.map(service => (
-          <div
+          <div 
+            className="service-card" 
             key={service.id}
-            className="service-card"
             onClick={() => handleServiceClick(service.id)}
+            style={{ cursor: 'pointer' }}
           >
             <div className="service-icon">{service.icon}</div>
             <h3>{service.title}</h3>
             <p>{service.description}</p>
-            <div className="service-meta">
-              <span className="service-category">{service.category}</span>
-              <div className="service-tags">
-                {service.tags.map((tag, index) => (
-                  <span key={index} className="service-tag">{tag}</span>
-                ))}
-              </div>
+            <div className="service-tags">
+              {service.tags.map((tag, index) => (
+                <span key={index} className="tag">{tag}</span>
+              ))}
+            </div>
+            <div className="view-providers">
+              <span>View Providers</span>
+              <i className="fas fa-arrow-right"></i>
             </div>
           </div>
         ))}

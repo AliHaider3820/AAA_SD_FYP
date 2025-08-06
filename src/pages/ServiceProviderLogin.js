@@ -1,16 +1,26 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../App';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
-const ServiceProviderLogin = () => {
+const BusinessLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const location = useLocation();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Always redirect to home page after login for business users
+      const redirectTo = '/home';
+      navigate(redirectTo, { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,21 +35,9 @@ const ServiceProviderLogin = () => {
     setError('');
     
     try {
-      // Attempt to login as a service provider
-      const success = await login(formData.email, formData.password, true);
+      const success = await login(formData.email, formData.password, 'business');
       
-      if (success) {
-        // Check if the logged-in user is a service provider
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        if (currentUser.isServiceProvider) {
-          navigate('/business-profile');
-        } else {
-          // If not a service provider, show error and log them out
-          setError('Please use the client login or register as a service provider.');
-          localStorage.removeItem('currentUser');
-          window.location.reload();
-        }
-      } else {
+      if (!success) {
         setError('Invalid email or password');
       }
     } catch (err) {
@@ -51,7 +49,7 @@ const ServiceProviderLogin = () => {
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
-        <h2>Service Provider Login</h2>
+        <h2>Business Login</h2>
         
         {error && <div className="error-message">{error}</div>}
         
@@ -65,7 +63,7 @@ const ServiceProviderLogin = () => {
             onChange={handleChange}
             required
             className="form-input"
-            placeholder="Enter your email"
+            placeholder="Enter your business email"
           />
         </div>
         
@@ -85,11 +83,14 @@ const ServiceProviderLogin = () => {
         </div>
         
         <button type="submit" className="login-button">
-          Login as Service Provider
+          Login to Business Account
         </button>
         
         <p className="signup-link">
-          Don't have a business account? <Link to="/ServiceProviderSignup" className="nav-link">Register Here</Link>
+          Don't have a business account?{' '}
+          <Link to="/service-provider-signup" className="nav-link">
+            Register Your Business
+          </Link>
         </p>
         
         <p className="switch-login">
@@ -100,4 +101,4 @@ const ServiceProviderLogin = () => {
   );
 };
 
-export default ServiceProviderLogin;
+export default BusinessLogin;

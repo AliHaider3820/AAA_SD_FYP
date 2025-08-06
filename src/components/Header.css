@@ -86,18 +86,6 @@
     gap: 1rem;
   }
   
-  .login-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
-  
-  .login-btn:hover {
-    color: #3498db;
-  }
   
   /* Become Provider Button */
   .become-provider-btn {
@@ -131,19 +119,6 @@
     display: none;
   }
   
-  .signup-btn {
-    padding: 0.5rem 1.5rem;
-    border-radius: 4px;
-    background: #3498db;
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
-  
-  .signup-btn:hover {
-    background: #2980b9;
-  }
   
   .header-content {
     display: flex;
@@ -550,6 +525,10 @@
       font-size: 2.4rem;
       margin-bottom: 0.25rem;
     }
+  #nav-link2{
+    display: none;
+  }
+    
   
     .logo-subtitle {
       font-size: 1.2rem;
@@ -929,16 +908,17 @@
   .login-btn {
     padding: 0.5rem 1.5rem;
     border-radius: 4px;
-    background: #3498db;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
     color: white;
     text-decoration: none;
+    box-shadow: 0 2px 10px rgba(41, 128, 185, 0.3);
     font-weight: 500;
     transition: all 0.3s ease;
   }
 
   .login-btn:hover {
-    color: #3498db;
-    background-color: rgba(52, 152, 219, 0.1);
+    color: #ffffff;
+    background: rgba(52, 152, 219, 0.1);
   }
 
   /* Sign Up Button */

@@ -5,8 +5,32 @@ import './ServiceCard.css';
 const ServiceCard = ({ service }) => {
   const navigate = useNavigate();
 
+  // Map service names to service IDs based on the serviceTitles in ServiceProviders.js
+  const serviceNameToId = {
+    'Plumbering': 1,
+    'Electrition': 2,
+    'Food Catering': 3,
+    'Home Painting': 4,
+    'Transport Services': 5,
+    'Home Cleaning': 6,
+    'Gardening & Lawn': 7,
+    'Pest Control': 8,
+    'Locksmith Services': 9,
+    'Online Courses': 10,
+    'Food Delivery': 11,
+    'Personal Training': 12
+  };
+
   const handleCardClick = () => {
-    navigate(`/service-providers/${service.id}`);
+    // Navigate to the service providers page with the correct service ID
+    const serviceId = serviceNameToId[service.name] || 1; // Default to 1 if not found
+    navigate(`/service-providers/${serviceId}`);
+  };
+
+  const handleBookNow = (e) => {
+    e.stopPropagation();
+    const serviceId = serviceNameToId[service.name] || 1;
+    navigate(`/service-providers/${serviceId}`);
   };
 
   return (
@@ -39,10 +63,13 @@ const ServiceCard = ({ service }) => {
           </div>
           <div className="service-price">
             <span>{service.price}</span>
-            <button className="book-button" onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/service-providers/${service.id}`);
-            }}>Book Now</button>
+            <button 
+              className="book-button" 
+              onClick={handleBookNow}
+              aria-label={`Book ${service.name} now`}
+            >
+              Book Now
+            </button>
           </div>
         </div>
       </div>

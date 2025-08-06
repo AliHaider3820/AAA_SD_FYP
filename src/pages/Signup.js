@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { AuthContext } from '../App';
+import { AuthContext } from '../context/AuthContext';
 function Signup() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -54,6 +54,8 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Form submitted with data:', formData);
+    
     if (!formData.location.trim()) {
       setError('Please enter your location');
       return;
@@ -65,14 +67,18 @@ function Signup() {
     }
 
     try {
-      const result = register({
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
+      console.log('Attempting to register user...');
+      const result = await register({
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        email: formData.email.trim(),
         password: formData.password,
-        location: formData.location
+        location: formData.location.trim()
       });
 
-      if (result.success) {
+      console.log('Registration result:', result);
+
+      if (result && result.success) {
+        console.log('Registration successful, resetting form...');
         setFormData({
           firstName: '',
           lastName: '',
@@ -82,13 +88,20 @@ function Signup() {
           location: ''
         });
         setError('');
+        console.log('Redirecting to home page...');
         window.location.href = '/';
       } else {
-        setError(result.message || 'Registration failed');
+        const errorMessage = result?.message || 'Registration failed';
+        console.error('Registration failed:', errorMessage);
+        setError(errorMessage);
       }
     } catch (err) {
-      setError('An error occurred during registration');
-      console.error('Registration error:', err);
+      console.error('Error during registration:', {
+        error: err,
+        message: err.message,
+        stack: err.stack
+      });
+      setError('An error occurred during registration. Please try again.');
     }
   };
 

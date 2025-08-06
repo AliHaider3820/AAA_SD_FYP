@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { AuthContext } from '../App';
+import { AuthContext } from '../context/AuthContext';
 import { FaUser, FaEnvelope, FaMapMarkerAlt, FaEdit, FaCamera } from 'react-icons/fa';
 import './Profile.css';
 

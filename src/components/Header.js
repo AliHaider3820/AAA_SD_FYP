@@ -1,6 +1,6 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../App';
+import { AuthContext } from '../context/AuthContext';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import BusinessDropdown from './BusinessDropdown';
 import './Header.css';
@@ -126,46 +126,48 @@ const Header = () => {
               user={user} 
               onLogout={handleLogout}
             />
-            <Link to="/reviews" className="nav-link">Write a Review</Link>
+            <Link to="/reviews" className="nav-link" id="nav-link2">Write a Review</Link>
             
             {isAuthenticated ? (
-              <div className="profile-container" ref={profileRef}>
-                <button 
-                  className="profile-btn" 
-                  onClick={toggleProfileDropdown}
-                  aria-expanded={showProfileDropdown}
-                  aria-label="Profile menu"
-                >
-                  {user?.profilePicture ? (
-                    <img 
-                      src={user.profilePicture} 
-                      alt="Profile" 
-                      className="profile-pic"
-                    />
-                  ) : (
-                    <FaUserCircle className="profile-icon" />
+              !user?.isServiceProvider && (
+                <div className="profile-container" ref={profileRef}>
+                  <button 
+                    className="profile-btn" 
+                    onClick={toggleProfileDropdown}
+                    aria-expanded={showProfileDropdown}
+                    aria-label="Profile menu"
+                  >
+                    {user?.profilePicture ? (
+                      <img 
+                        src={user.profilePicture} 
+                        alt="Profile" 
+                        className="profile-pic"
+                      />
+                    ) : (
+                      <FaUserCircle className="profile-icon" />
+                    )}
+                    <span className="profile-name">My Profile</span>
+                  </button>
+                  
+                  {showProfileDropdown && (
+                    <div className="dropdown-menu">
+                      <Link 
+                        to="/profile" 
+                        className="dropdown-item" 
+                        onClick={() => setShowProfileDropdown(false)}
+                      >
+                        <FaUserCircle /> My Profile
+                      </Link>
+                      <button 
+                        className="dropdown-item" 
+                        onClick={handleLogout}
+                      >
+                        <FaSignOutAlt /> Logout
+                      </button>
+                    </div>
                   )}
-                  <span className="profile-name">My Profile</span>
-                </button>
-                
-                {showProfileDropdown && (
-                  <div className="dropdown-menu">
-                    <Link 
-                      to="/profile" 
-                      className="dropdown-item" 
-                      onClick={() => setShowProfileDropdown(false)}
-                    >
-                      <FaUserCircle /> My Profile
-                    </Link>
-                    <button 
-                      className="dropdown-item" 
-                      onClick={handleLogout}
-                    >
-                      <FaSignOutAlt /> Logout
-                    </button>
-                  </div>
-                )}
-              </div>
+                </div>
+              )
             ) : (
               <div className="auth-buttons">
                 <Link to="/login" className="login-btn" onClick={closeMobileMenu}>Login</Link>

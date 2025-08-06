@@ -76,10 +76,6 @@
   font-weight: 500;
 }
 
-.signup-link a:hover {
-  text-decoration: underline;
-}
-
 .error-message {
   color: #e74c3c;
   background-color: #fde8e8;
@@ -100,8 +96,4 @@
   color: #4a90e2;
   text-decoration: none;
   font-weight: 500;
-}
-
-.switch-login a:hover {
-  text-decoration: underline;
 }

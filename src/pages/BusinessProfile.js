@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaStar, FaPhone, FaMapMarkerAlt, FaEnvelope, FaEdit } from 'react-icons/fa';
-import { AuthContext } from '../App';
+import { AuthContext } from '../context/AuthContext';
 import './BusinessProfile.css';
 
 const BusinessProfile = () => {

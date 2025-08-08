@@ -22,6 +22,8 @@ import NotFound from './pages/NotFound';
 import ServiceProviderSignup from './pages/ServiceProviderSignup';
 import BusinessProfile from './pages/BusinessProfile';
 import BusinessDashboard from './pages/BusinessDashboard';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -93,14 +95,31 @@ const AppContent = () => {
               <BusinessDashboard />
             </PrivateRoute>
           } />
+          <Route path="/business-dashboard" element={
+            <PrivateRoute>
+              <BusinessDashboard />
+            </PrivateRoute>
+          } />
           <Route path="/business/profile" element={
             <PrivateRoute requiredUserType="business">
               <BusinessProfile />
             </PrivateRoute>
           } />
 
+          {/* Password Reset Routes */}
+          <Route path="/forgot-password" element={
+            <GuestRoute>
+              <ForgotPassword />
+            </GuestRoute>
+          } />
+          <Route path="/reset-password" element={
+            <GuestRoute>
+              <ResetPassword />
+            </GuestRoute>
+          } />
+
           {/* 404 Route */}
-          <Route path="*" element={<Home />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />

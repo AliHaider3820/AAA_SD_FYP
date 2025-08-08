@@ -86,6 +86,10 @@ const BusinessLogin = () => {
           Login to Business Account
         </button>
         
+        <p className="forgot-password">
+          <Link to="/forgot-password" className="nav-link">Forgot Password?</Link>
+        </p>
+        
         <p className="signup-link">
           Don't have a business account?{' '}
           <Link to="/service-provider-signup" className="nav-link">

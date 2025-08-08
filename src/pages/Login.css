@@ -64,10 +64,28 @@
   background-color: #3a7bc8;
 }
 
+.forgot-password {
+  text-align: right;
+  margin: 10px 0;
+}
+
+.forgot-password a {
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.forgot-password a:hover {
+  color: #4a90e2;
+}
+
 .signup-link {
   text-align: center;
   margin-top: 20px;
   color: #666;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
 }
 
 .signup-link a {

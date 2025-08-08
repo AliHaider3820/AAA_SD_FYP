@@ -85,6 +85,10 @@ function ClientLogin() {
           Login as Client
         </button>
         
+        <p className="forgot-password">
+          <Link to="/forgot-password" className="nav-link">Forgot Password?</Link>
+        </p>
+        
         <p className="signup-link">
           Don't have an account? <Link to="/signup" className="nav-link">Sign Up</Link>
         </p>

@@ -47,17 +47,10 @@ const ReviewPage = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-<<<<<<< HEAD
-  
-  useEffect(() => {
-    try {
-    
-=======
   // Get service providers from shared data
   useEffect(() => {
     try {
       // Import service providers from the shared data file
->>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
       import('../data/serviceProviders').then(module => {
         const providersData = module.default;
         setServiceProviders(providersData);
@@ -73,11 +66,7 @@ const ReviewPage = () => {
     }
   }, []);
   
-<<<<<<< HEAD
- 
-=======
   // Filter providers based on search query
->>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
   useEffect(() => {
     if (selectedCategory && serviceProviders[selectedCategory]) {
       const filtered = serviceProviders[selectedCategory].filter(provider => 
@@ -100,182 +89,53 @@ const ReviewPage = () => {
     setShowProviderList(false);
   };
 
-<<<<<<< HEAD
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setSuccess('');
-
-
-  if (!reviewerName.trim()) {
-    toast.error('Please enter your name.');
-    return;
-  }
-
-  
-  if (review.length < 45) {
-    toast.error('Review must be at least 45 characters long.');
-    return;
-  }
-
- 
-  if (rating === 0) {
-    toast.error('Please select a rating.');
-    return;
-  }
-
-  
-  if (!selectedProvider) {
-    toast.error('Please select a service provider.');
-    return;
-  }
-
-  setIsLoading(true);
-
-  const reviewData = {
-    reviewerName: reviewerName.trim(),
-    providerId: selectedProvider.id || selectedProvider._id,
-    providerName: selectedProvider.name,
-    providerImage: selectedProvider.image,
-    providerCategory: serviceCategories[selectedCategory] || 'General',
-    rating,
-    comment: review
-  };
-
-  try {
-    const res = await fetch('http://localhost:5000/api/reviews', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include', 
-      body: JSON.stringify(reviewData)
-    });
-
-    const data = await res.json();
-
-    if (res.status === 401) {
-      toast.error('Please log in to submit a review.');
-      setTimeout(() => {
-        window.location.href = '/login'; 
-      }, 1500);
-      return;
-    }
-
-    if (res.ok) {
-      toast.success(data.message || '✅ Review submitted successfully!', {
-        position: 'top-right',
-        autoClose: 3000,
-        theme: 'light'
-      });
-
-     
-      setRating(0);
-      setReviewerName('');
-      setReview('');
-      setSelectedProvider(null);
-    } else {
-      toast.error(data.message || '❌ Failed to submit review.');
-    }
-  } catch (err) {
-    console.error('Error submitting review:', err);
-    toast.error('❌ Failed to submit review. Please try again.Please first login.');
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
-
-=======
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate name
-    if (!reviewerName.trim()) {
-      setError('Please enter your name.');
+    setError('');
+    setSuccess('');
+
+    if (!selectedCategory) {
+      setError('Please select a service category');
       return;
     }
-    
-    // Validate review length
-    if (review.length < 45) {
-      setError('Review must be at least 45 characters long.');
-      return;
-    }
-    
-    // Validate rating
-    if (rating === 0) {
-      setError('Please select a rating.');
-      return;
-    }
-    
-    // Validate provider selection
+
     if (!selectedProvider) {
-      setError('Please select a service provider.');
+      setError('Please select a service provider');
       return;
     }
-    
-    // Create review object
-    const newReview = {
-      id: Date.now(),
-      reviewerName: reviewerName.trim(),
-      providerId: selectedProvider.id,
-      providerName: selectedProvider.name,
-      providerImage: selectedProvider.image,
-      providerCategory: serviceCategories[selectedCategory] || 'General',
-      rating,
-      review,
-      date: new Date().toISOString()
-    };
-    
+
+    if (rating === 0) {
+      setError('Please provide a rating');
+      return;
+    }
+
+    if (!review.trim()) {
+      setError('Please write a review');
+      return;
+    }
+
     try {
-      // Get existing reviews from localStorage or initialize empty object
-      const savedReviews = JSON.parse(localStorage.getItem('providerReviews') || '{}');
-      
-      // Format the review to match ProviderProfile.js format
-      const formattedReview = {
-        id: Date.now(),
-        name: reviewerName.trim(),
-        rating: rating,
-        comment: review,
-        date: new Date().toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })
-      };
-      
-      // Get existing reviews for this provider or initialize empty array
-      const providerKey = String(selectedProvider.id);
-      const providerReviews = savedReviews[providerKey] || [];
-      
-      // Add new review
-      const updatedReviews = [...providerReviews, formattedReview];
-      
-      // Save back to localStorage
-      savedReviews[providerKey] = updatedReviews;
-      localStorage.setItem('providerReviews', JSON.stringify(savedReviews));
-      
-      // Also save to the reviews list for the review page
-      const allReviews = JSON.parse(localStorage.getItem('reviews') || '[]');
-      localStorage.setItem('reviews', JSON.stringify([...allReviews, newReview]));
-      
-      // Show success message and reset form
+      // Here you would typically send the review to your backend
+      // For now, we'll just show a success message
       setSuccess('Thank you for your review!');
-      setRating(0);
-      setReviewerName('');
-      setReview('');
-      setSelectedProvider('');
-      setError('');
+      toast.success('Review submitted successfully!');
       
-      // Clear success message after 5 seconds
-      setTimeout(() => setSuccess(''), 5000);
+      // Reset form
+      setRating(0);
+      setReview('');
+      setSelectedCategory('');
+      setSelectedProvider(null);
+      
+      // Navigate back after a short delay
+      setTimeout(() => {
+        navigate(-1);
+      }, 1500);
     } catch (err) {
-      console.error('Error saving review:', err);
-      setError('Failed to save review. Please try again.');
+      console.error('Error submitting review:', err);
+      setError('Failed to submit review. Please try again.');
+      toast.error('Failed to submit review');
     }
   };
->>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
 
   const handleProviderChange = (e) => {
     setSelectedProvider(e.target.value);
@@ -288,18 +148,14 @@ const handleSubmit = async (e) => {
       </button>
       
       <div className="review-container">
-        <h1>Rate & Review</h1>
+        <h1>Write a Review</h1>
         <p className="subtitle">Share your experience with our service providers</p>
         
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
         
         <form onSubmit={handleSubmit} className="review-form">
-<<<<<<< HEAD
-       
-=======
           {/* Category Selection */}
->>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
           <div className="form-group">
             <label>Select Service Category</label>
             <div className="dropdown">
@@ -326,11 +182,7 @@ const handleSubmit = async (e) => {
             </div>
           </div>
 
-<<<<<<< HEAD
-        
-=======
           {/* Provider Selection */}
->>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
           {selectedCategory && (
             <div className="form-group">
               <label>Select Service Provider</label>
@@ -416,51 +268,35 @@ const handleSubmit = async (e) => {
           
           <div className="form-group">
             <label>Your Rating</label>
-            <div className="rating">
-              <p className="rating-message">{rating > 0 ? ratingMessages[rating] : 'Rate this provider'}</p>
-              <div className="stars">
-                {[1, 2, 3, 4, 5].map((star) => {
-<<<<<<< HEAD
+            <div className="stars">
+              {[1, 2, 3, 4, 5].map((star) => {
+                // Determine star color based on the current rating (or hover state)
+                const currentRating = hover || rating;
+                let starColor = '#e4e5e9'; // Default gray
                 
-                  const currentRating = hover || rating;
-                  let starColor = '#e4e5e9'; 
-                  
-                  if (star <= currentRating) {
-                    if (currentRating <= 2) {
-                      starColor = '#ff4444'; 
-                    } else if (currentRating === 3) {
-                      starColor = '#f4ec07'; 
-                    } else {
-                      starColor = '#f9b90b'; 
-=======
-                  // Determine star color based on the current rating (or hover state)
-                  const currentRating = hover || rating;
-                  let starColor = '#e4e5e9'; // Default gray
-                  
-                  if (star <= currentRating) {
-                    if (currentRating <= 2) {
-                      starColor = '#ff4444'; // Red for 1-2 stars
-                    } else if (currentRating === 3) {
-                      starColor = '#f4ec07'; // Yellow for 3 stars
-                    } else {
-                      starColor = '#f9b90b'; // Gold for 4-5 stars
-                    }
+                if (star <= currentRating) {
+                  if (currentRating <= 2) {
+                    starColor = '#ff4444'; // Red for 1-2 stars
+                  } else if (currentRating === 3) {
+                    starColor = '#f4ec07'; // Yellow for 3 stars
+                  } else {
+                    starColor = '#f9b90b'; // Gold for 4-5 stars
                   }
-                  
-                  return (
-                    <FaStar
-                      key={star}
-                      className="star"
-                      color={starColor}
-                      size={32}
-                      onMouseEnter={() => setHover(star)}
-                      onMouseLeave={() => setHover(0)}
-                      onClick={() => setRating(star)}
-                      style={{ cursor: 'pointer', transition: 'color 0.2s' }}
-                    />
-                  );
-                })}
-              </div>
+                }
+                
+                return (
+                  <FaStar
+                    key={star}
+                    className="star"
+                    color={starColor}
+                    size={32}
+                    onMouseEnter={() => setHover(star)}
+                    onMouseLeave={() => setHover(0)}
+                    onClick={() => setRating(star)}
+                    style={{ cursor: 'pointer', transition: 'color 0.2s' }}
+                  />
+                );
+              })}
             </div>
           </div>
           

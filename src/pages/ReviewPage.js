@@ -20,7 +20,7 @@ const ReviewPage = () => {
   const [success, setSuccess] = useState('');
   const [reviewerName, setReviewerName] = useState('');
   
-  // Service categories mapping
+ 
   const serviceCategories = {
     1: 'Plumbing Services',
     2: 'Electrical Work',
@@ -35,7 +35,7 @@ const ReviewPage = () => {
     11: 'Food Delivery'
   };
   
-  // Rating messages based on the selected rating
+ 
   const ratingMessages = {
     1: 'Not good',
     2: 'Could’ve been better',
@@ -47,10 +47,10 @@ const ReviewPage = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-  // Get service providers from shared data
+  
   useEffect(() => {
     try {
-      // Import service providers from the shared data file
+    
       import('../data/serviceProviders').then(module => {
         const providersData = module.default;
         setServiceProviders(providersData);
@@ -66,7 +66,7 @@ const ReviewPage = () => {
     }
   }, []);
   
-  // Filter providers based on search query
+ 
   useEffect(() => {
     if (selectedCategory && serviceProviders[selectedCategory]) {
       const filtered = serviceProviders[selectedCategory].filter(provider => 
@@ -89,53 +89,92 @@ const ReviewPage = () => {
     setShowProviderList(false);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setSuccess('');
 
-    if (!selectedCategory) {
-      setError('Please select a service category');
-      return;
-    }
 
-    if (!selectedProvider) {
-      setError('Please select a service provider');
-      return;
-    }
+  if (!reviewerName.trim()) {
+    toast.error('Please enter your name.');
+    return;
+  }
 
-    if (rating === 0) {
-      setError('Please provide a rating');
-      return;
-    }
+  
+  if (review.length < 45) {
+    toast.error('Review must be at least 45 characters long.');
+    return;
+  }
 
-    if (!review.trim()) {
-      setError('Please write a review');
-      return;
-    }
+ 
+  if (rating === 0) {
+    toast.error('Please select a rating.');
+    return;
+  }
 
-    try {
-      // Here you would typically send the review to your backend
-      // For now, we'll just show a success message
-      setSuccess('Thank you for your review!');
-      toast.success('Review submitted successfully!');
-      
-      // Reset form
-      setRating(0);
-      setReview('');
-      setSelectedCategory('');
-      setSelectedProvider(null);
-      
-      // Navigate back after a short delay
-      setTimeout(() => {
-        navigate(-1);
-      }, 1500);
-    } catch (err) {
-      console.error('Error submitting review:', err);
-      setError('Failed to submit review. Please try again.');
-      toast.error('Failed to submit review');
-    }
+  
+  if (!selectedProvider) {
+    toast.error('Please select a service provider.');
+    return;
+  }
+
+  setIsLoading(true);
+
+  const reviewData = {
+    reviewerName: reviewerName.trim(),
+    providerId: selectedProvider.id || selectedProvider._id,
+    providerName: selectedProvider.name,
+    providerImage: selectedProvider.image,
+    providerCategory: serviceCategories[selectedCategory] || 'General',
+    rating,
+    comment: review
   };
+
+  try {
+    const res = await fetch('http://localhost:5000/api/reviews', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include', 
+      body: JSON.stringify(reviewData)
+    });
+
+    const data = await res.json();
+
+    if (res.status === 401) {
+      toast.error('Please log in to submit a review.');
+      setTimeout(() => {
+        window.location.href = '/login'; 
+      }, 1500);
+      return;
+    }
+
+    if (res.ok) {
+      toast.success(data.message || '✅ Review submitted successfully!', {
+        position: 'top-right',
+        autoClose: 3000,
+        theme: 'light'
+      });
+
+     
+      setRating(0);
+      setReviewerName('');
+      setReview('');
+      setSelectedProvider(null);
+    } else {
+      toast.error(data.message || '❌ Failed to submit review.');
+    }
+  } catch (err) {
+    console.error('Error submitting review:', err);
+    toast.error('❌ An error occurred. Please try again.');
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+
 
   const handleProviderChange = (e) => {
     setSelectedProvider(e.target.value);
@@ -148,14 +187,14 @@ const ReviewPage = () => {
       </button>
       
       <div className="review-container">
-        <h1>Write a Review</h1>
+        <h1>Rate & Review</h1>
         <p className="subtitle">Share your experience with our service providers</p>
         
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
         
         <form onSubmit={handleSubmit} className="review-form">
-          {/* Category Selection */}
+       
           <div className="form-group">
             <label>Select Service Category</label>
             <div className="dropdown">
@@ -182,7 +221,7 @@ const ReviewPage = () => {
             </div>
           </div>
 
-          {/* Provider Selection */}
+        
           {selectedCategory && (
             <div className="form-group">
               <label>Select Service Provider</label>
@@ -268,35 +307,38 @@ const ReviewPage = () => {
           
           <div className="form-group">
             <label>Your Rating</label>
-            <div className="stars">
-              {[1, 2, 3, 4, 5].map((star) => {
-                // Determine star color based on the current rating (or hover state)
-                const currentRating = hover || rating;
-                let starColor = '#e4e5e9'; // Default gray
+            <div className="rating">
+              <p className="rating-message">{rating > 0 ? ratingMessages[rating] : 'Rate this provider'}</p>
+              <div className="stars">
+                {[1, 2, 3, 4, 5].map((star) => {
                 
-                if (star <= currentRating) {
-                  if (currentRating <= 2) {
-                    starColor = '#ff4444'; // Red for 1-2 stars
-                  } else if (currentRating === 3) {
-                    starColor = '#f4ec07'; // Yellow for 3 stars
-                  } else {
-                    starColor = '#f9b90b'; // Gold for 4-5 stars
+                  const currentRating = hover || rating;
+                  let starColor = '#e4e5e9'; 
+                  
+                  if (star <= currentRating) {
+                    if (currentRating <= 2) {
+                      starColor = '#ff4444'; 
+                    } else if (currentRating === 3) {
+                      starColor = '#f4ec07'; 
+                    } else {
+                      starColor = '#f9b90b'; 
+                    }
                   }
-                }
-                
-                return (
-                  <FaStar
-                    key={star}
-                    className="star"
-                    color={starColor}
-                    size={32}
-                    onMouseEnter={() => setHover(star)}
-                    onMouseLeave={() => setHover(0)}
-                    onClick={() => setRating(star)}
-                    style={{ cursor: 'pointer', transition: 'color 0.2s' }}
-                  />
-                );
-              })}
+                  
+                  return (
+                    <FaStar
+                      key={star}
+                      className="star"
+                      color={starColor}
+                      size={32}
+                      onMouseEnter={() => setHover(star)}
+                      onMouseLeave={() => setHover(0)}
+                      onClick={() => setRating(star)}
+                      style={{ cursor: 'pointer', transition: 'color 0.2s' }}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
           

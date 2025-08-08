@@ -55,11 +55,7 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form submitted with data:', formData);
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
     if (!formData.location.trim()) {
       setError('Please enter your location');
       return;
@@ -73,17 +69,11 @@ function Signup() {
     try {
       console.log('Attempting to register user...');
       const result = await register({
-<<<<<<< HEAD
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password,
         confirmPassword: formData.confirmPassword,
-=======
-        name: `${formData.firstName} ${formData.lastName}`.trim(),
-        email: formData.email.trim(),
-        password: formData.password,
->>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
         location: formData.location.trim()
       });
 
@@ -205,21 +195,12 @@ function Signup() {
       <form onSubmit={handleSubmit} className="login-form">
         <h2>Create an Account ({step}/3)</h2>
         {error && <div className="error">{error}</div>}
-<<<<<<< HEAD
 
         {renderStep()}
 
         <div className="form-navigation">
           {step > 1 && (
             <button type="button" onClick={prevStep} className="nav-button" style={{ margin: '10px' }}>
-=======
-        
-        {renderStep()}
-        
-        <div className="form-navigation">
-          {step > 1 && (
-            <button type="button" onClick={prevStep} className="nav-button"style={{margin: '10px'}}>
->>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
               Back
             </button>
           )}
@@ -233,11 +214,7 @@ function Signup() {
             </button>
           )}
         </div>
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
         <p className="login-link">
           Already have an account? <a className='nav-link' href="/login">Log in</a>
         </p>

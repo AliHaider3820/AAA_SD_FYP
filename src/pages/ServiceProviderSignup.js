@@ -13,9 +13,11 @@ const serviceCategories = [
   { id: 7, name: 'Gardening & Lawn' },
   { id: 8, name: 'Home Repair' },
   { id: 9, name: 'Locksmith Services' },
-  { id: 10, name: 'Online Curses' },
+  { id: 10, name: 'Moving & Storage' },
   { id: 11, name: 'Food Delivery' },
-  { id: 12, name: 'Other' }
+  { id: 12, name: 'Pest Control' },
+  { id: 13, name: 'Personal Training' },
+  { id: 14, name: 'Other' }
 ];
 
 const ServiceProviderSignup = () => {

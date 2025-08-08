@@ -20,7 +20,7 @@ const ReviewPage = () => {
   const [success, setSuccess] = useState('');
   const [reviewerName, setReviewerName] = useState('');
   
- 
+  // Service categories mapping
   const serviceCategories = {
     1: 'Plumbing Services',
     2: 'Electrical Work',
@@ -35,7 +35,7 @@ const ReviewPage = () => {
     11: 'Food Delivery'
   };
   
- 
+  // Rating messages based on the selected rating
   const ratingMessages = {
     1: 'Not good',
     2: 'Could’ve been better',
@@ -47,10 +47,17 @@ const ReviewPage = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
+<<<<<<< HEAD
   
   useEffect(() => {
     try {
     
+=======
+  // Get service providers from shared data
+  useEffect(() => {
+    try {
+      // Import service providers from the shared data file
+>>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
       import('../data/serviceProviders').then(module => {
         const providersData = module.default;
         setServiceProviders(providersData);
@@ -66,7 +73,11 @@ const ReviewPage = () => {
     }
   }, []);
   
+<<<<<<< HEAD
  
+=======
+  // Filter providers based on search query
+>>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
   useEffect(() => {
     if (selectedCategory && serviceProviders[selectedCategory]) {
       const filtered = serviceProviders[selectedCategory].filter(provider => 
@@ -89,6 +100,7 @@ const ReviewPage = () => {
     setShowProviderList(false);
   };
 
+<<<<<<< HEAD
 const handleSubmit = async (e) => {
   e.preventDefault();
   setError('');
@@ -175,6 +187,95 @@ const handleSubmit = async (e) => {
 
 
 
+=======
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Validate name
+    if (!reviewerName.trim()) {
+      setError('Please enter your name.');
+      return;
+    }
+    
+    // Validate review length
+    if (review.length < 45) {
+      setError('Review must be at least 45 characters long.');
+      return;
+    }
+    
+    // Validate rating
+    if (rating === 0) {
+      setError('Please select a rating.');
+      return;
+    }
+    
+    // Validate provider selection
+    if (!selectedProvider) {
+      setError('Please select a service provider.');
+      return;
+    }
+    
+    // Create review object
+    const newReview = {
+      id: Date.now(),
+      reviewerName: reviewerName.trim(),
+      providerId: selectedProvider.id,
+      providerName: selectedProvider.name,
+      providerImage: selectedProvider.image,
+      providerCategory: serviceCategories[selectedCategory] || 'General',
+      rating,
+      review,
+      date: new Date().toISOString()
+    };
+    
+    try {
+      // Get existing reviews from localStorage or initialize empty object
+      const savedReviews = JSON.parse(localStorage.getItem('providerReviews') || '{}');
+      
+      // Format the review to match ProviderProfile.js format
+      const formattedReview = {
+        id: Date.now(),
+        name: reviewerName.trim(),
+        rating: rating,
+        comment: review,
+        date: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      };
+      
+      // Get existing reviews for this provider or initialize empty array
+      const providerKey = String(selectedProvider.id);
+      const providerReviews = savedReviews[providerKey] || [];
+      
+      // Add new review
+      const updatedReviews = [...providerReviews, formattedReview];
+      
+      // Save back to localStorage
+      savedReviews[providerKey] = updatedReviews;
+      localStorage.setItem('providerReviews', JSON.stringify(savedReviews));
+      
+      // Also save to the reviews list for the review page
+      const allReviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+      localStorage.setItem('reviews', JSON.stringify([...allReviews, newReview]));
+      
+      // Show success message and reset form
+      setSuccess('Thank you for your review!');
+      setRating(0);
+      setReviewerName('');
+      setReview('');
+      setSelectedProvider('');
+      setError('');
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccess(''), 5000);
+    } catch (err) {
+      console.error('Error saving review:', err);
+      setError('Failed to save review. Please try again.');
+    }
+  };
+>>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
 
   const handleProviderChange = (e) => {
     setSelectedProvider(e.target.value);
@@ -194,7 +295,11 @@ const handleSubmit = async (e) => {
         {success && <div className="success-message">{success}</div>}
         
         <form onSubmit={handleSubmit} className="review-form">
+<<<<<<< HEAD
        
+=======
+          {/* Category Selection */}
+>>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
           <div className="form-group">
             <label>Select Service Category</label>
             <div className="dropdown">
@@ -221,7 +326,11 @@ const handleSubmit = async (e) => {
             </div>
           </div>
 
+<<<<<<< HEAD
         
+=======
+          {/* Provider Selection */}
+>>>>>>> f2711a50c91e7effc1e60b5133d9ddbea30c8afe
           {selectedCategory && (
             <div className="form-group">
               <label>Select Service Provider</label>
@@ -311,6 +420,7 @@ const handleSubmit = async (e) => {
               <p className="rating-message">{rating > 0 ? ratingMessages[rating] : 'Rate this provider'}</p>
               <div className="stars">
                 {[1, 2, 3, 4, 5].map((star) => {
+<<<<<<< HEAD
                 
                   const currentRating = hover || rating;
                   let starColor = '#e4e5e9'; 
@@ -322,6 +432,18 @@ const handleSubmit = async (e) => {
                       starColor = '#f4ec07'; 
                     } else {
                       starColor = '#f9b90b'; 
+=======
+                  // Determine star color based on the current rating (or hover state)
+                  const currentRating = hover || rating;
+                  let starColor = '#e4e5e9'; // Default gray
+                  
+                  if (star <= currentRating) {
+                    if (currentRating <= 2) {
+                      starColor = '#ff4444'; // Red for 1-2 stars
+                    } else if (currentRating === 3) {
+                      starColor = '#f4ec07'; // Yellow for 3 stars
+                    } else {
+                      starColor = '#f9b90b'; // Gold for 4-5 stars
                     }
                   }
                   

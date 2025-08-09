@@ -21,9 +21,11 @@ import WriteReview from './pages/WriteReview';
 import NotFound from './pages/NotFound';
 import ServiceProviderSignup from './pages/ServiceProviderSignup';
 import BusinessProfile from './pages/BusinessProfile';
+import BusinessProfileEdit from './pages/BusinessProfileEdit';
 import BusinessDashboard from './pages/BusinessDashboard';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import ComplaintPage from './pages/ComplaintPage';
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -54,6 +56,7 @@ const AppContent = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/reviews" element={<ReviewPage />} />
+          <Route path="/complaint" element={<ComplaintPage />} />
           
           {/* Auth Routes */}
           <Route path="/login" element={
@@ -103,6 +106,11 @@ const AppContent = () => {
           <Route path="/business/profile" element={
             <PrivateRoute requiredUserType="business">
               <BusinessProfile />
+            </PrivateRoute>
+          } />
+          <Route path="/edit-business/:businessId" element={
+            <PrivateRoute requiredUserType="business">
+              <BusinessProfileEdit />
             </PrivateRoute>
           } />
 

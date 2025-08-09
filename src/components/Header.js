@@ -117,6 +117,7 @@ const Header = () => {
             <Link to="/services" className="nav-link" onClick={closeMobileMenu}>Services</Link>
             <Link to="/about" className="nav-link" onClick={closeMobileMenu}>About Us</Link>
             <Link to="/contact" className="nav-link" onClick={closeMobileMenu}>Contact</Link>
+            <Link to="/complaint" className="nav-link" onClick={closeMobileMenu}>File a Complaint</Link>
           </div>
 
           {/* Right side - profile and hamburger */}

@@ -119,7 +119,7 @@ const AppContent = () => {
           } />
 
           {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<Home/>} />
         </Routes>
       </main>
       <Footer />

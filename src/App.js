@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PrivateRoute } from './components/PrivateRoute';
@@ -6,28 +6,30 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import Services from './pages/Services';
-import ServiceProviders from './pages/ServiceProviders';
-import ProviderProfile from './pages/ProviderProfile';
-import Contact from './pages/Contact';
-import About from './pages/About';
-import ClientLogin from './pages/Login';
-import BusinessLogin from './pages/ServiceProviderLogin';
-import Signup from './pages/Signup';
-import Profile from './pages/Profile';
-import ReviewPage from './pages/ReviewPage';
-import WriteReview from './pages/WriteReview';
-import NotFound from './pages/NotFound';
-import ServiceProviderSignup from './pages/ServiceProviderSignup';
-import BusinessProfile from './pages/BusinessProfile';
-import BusinessProfileEdit from './pages/BusinessProfileEdit';
-import BusinessDashboard from './pages/BusinessDashboard';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import ComplaintPage from './pages/ComplaintPage';
+import Loading from './components/Loading';
 import './App.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
+
+// Lazy load components
+const Home = lazy(() => import('./pages/Home'));
+const Services = lazy(() => import('./pages/Services'));
+const ServiceProviders = lazy(() => import('./pages/ServiceProviders'));
+const ProviderProfile = lazy(() => import('./pages/ProviderProfile'));
+const Contact = lazy(() => import('./pages/Contact'));
+const About = lazy(() => import('./pages/About'));
+const ClientLogin = lazy(() => import('./pages/Login'));
+const BusinessLogin = lazy(() => import('./pages/ServiceProviderLogin'));
+const Signup = lazy(() => import('./pages/Signup'));
+const Profile = lazy(() => import('./pages/Profile'));
+const ReviewPage = lazy(() => import('./pages/ReviewPage'));
+const WriteReview = lazy(() => import('./pages/WriteReview'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const ServiceProviderSignup = lazy(() => import('./pages/ServiceProviderSignup'));
+const BusinessProfile = lazy(() => import('./pages/BusinessProfile'));
+const BusinessProfileEdit = lazy(() => import('./pages/BusinessProfileEdit'));
+const BusinessDashboard = lazy(() => import('./pages/BusinessDashboard'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const ComplaintPage = lazy(() => import('./pages/ComplaintPage'));
 
 // Guest route component to redirect authenticated users
 const GuestRoute = ({ children }) => {
@@ -46,7 +48,8 @@ const AppContent = () => {
     <div className="app">
       <Header />
       <main>
-        <Routes>
+        <Suspense fallback={<Loading />}>
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<Home />} />
@@ -128,7 +131,8 @@ const AppContent = () => {
 
           {/* 404 Route */}
           <Route path="*" element={<Home/>} />
-        </Routes>
+          </Routes>
+        </Suspense>
       </main>
       <Footer />
       <ToastContainer />

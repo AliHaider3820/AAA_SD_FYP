@@ -154,9 +154,6 @@ const BusinessProfile = () => {
         <div className="reviews-card">
           <div className="reviews-header">
             <h3>Customer Reviews</h3>
-            <Link to={`/add-review/${business.id}`} className="btn-secondary">
-              Write a Review
-            </Link>
           </div>
           
           {business.reviews?.length > 0 ? (

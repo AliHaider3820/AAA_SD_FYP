@@ -644,9 +644,31 @@ const ProviderProfile = () => {
 
   return (
     <div className="provider-profile">
-      <button className="back-button" onClick={() => window.history.back()}>
-        <i className="fas fa-arrow-left"></i> Back to Results
-      </button>
+      <div style={{ margin: '20px 0', display: 'flex', justifyContent: 'flex-start' }}>
+        <button 
+          onClick={() => navigate(-1)}
+          style={{
+            backgroundColor: '#4a6cf7',
+            color: 'white',
+            border: '2px solid #3a5bd9',
+            padding: '10px 20px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            fontSize: '1rem',
+            fontWeight: '500',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+            minWidth: '160px',
+            textAlign: 'center'
+          }}
+        >
+          <span style={{ display: 'inline-block', width: '20px', textAlign: 'center' }}>←</span>
+          <span>Back to Results</span>
+        </button>
+      </div>
       
       <div className="profile-header">
         <div className="profile-image-container">

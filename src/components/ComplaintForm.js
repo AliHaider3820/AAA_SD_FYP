@@ -224,7 +224,7 @@ const ComplaintForm = ({ serviceProviderId, onSubmit, onCancel }) => {
                           <img 
                             src={provider.image} 
                             alt={provider.name} 
-                            className="provider-image"
+                            className="provider-image1"
                             onError={(e) => {
                               // Hide the image if it fails to load
                               e.target.style.display = 'none';

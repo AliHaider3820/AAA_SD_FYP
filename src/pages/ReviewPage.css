@@ -98,6 +98,9 @@
   background-color: #f9f9f9;
 }
 
+/* Import shared image styles */
+@import '../styles/imageStyles.css';
+
 .provider-image1 {
   width: 40px;
   height: 40px;
@@ -105,6 +108,7 @@
   object-fit: cover;
   margin-right: 15px;
   border: 1px solid #eee;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .provider-info {
@@ -160,7 +164,12 @@
   object-fit: cover;
   margin-right: 15px;
   border: 2px solid #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.selected-provider-image:hover {
+  transform: scale(1.05);
 }
 
 .selected-provider-info h4 {

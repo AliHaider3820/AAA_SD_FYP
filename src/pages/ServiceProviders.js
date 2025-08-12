@@ -600,24 +600,31 @@ const ServiceProviders = () => {
 
   return (
     <div className="service-providers-container">
-      <button 
-        onClick={() => navigate('/services')} 
-        className="back-button"
-        style={{
-          marginBottom: '20px',
-          padding: '8px 16px',
-          backgroundColor: '#f0f0f0',
-          border: '1px solid #ddd',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}
-      >
-        <i className="fas fa-arrow-left"></i>
-        Back to Services
-      </button>
+      <div style={{ margin: '20px 0', display: 'flex', justifyContent: 'flex-start' }}>
+        <button 
+          onClick={() => navigate(-1)}
+          style={{
+            backgroundColor: '#4a6cf7',
+            color: 'white',
+            border: '2px solid #3a5bd9',
+            padding: '10px 20px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            fontSize: '1rem',
+            fontWeight: '500',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+            minWidth: '160px',
+            textAlign: 'center'
+          }}
+        >
+          <span style={{ display: 'inline-block', width: '20px', textAlign: 'center' }}>←</span>
+          <span>Back to Services</span>
+        </button>
+      </div>
       <h1 style={{ marginBottom: '30px', color: '#2c3e50', fontSize: '2rem' }}>
         {serviceTitle} Providers
       </h1>
@@ -639,16 +646,18 @@ const ServiceProviders = () => {
             }}
           >
             <div className="provider-image-container">
-              <img 
-                src={provider.profilePicture || provider.image || 'https://placehold.co/150x150?text=No+Image'} 
-                alt={provider.name} 
-                className="provider-image"
-                onError={(e) => {
-                  // Fallback to a placeholder if the image fails to load
-                  e.target.onerror = null;
-                  e.target.src = 'https://placehold.co/150x150?text=No+Image';
-                }}
-              />
+              <div className="image-container">
+                <img 
+                  src={provider.profilePicture || provider.image || 'https://placehold.co/150x150?text=No+Image'} 
+                  alt={provider.name} 
+                  className="profile-image hover-zoom"
+                  onError={(e) => {
+                    // Fallback to a placeholder if the image fails to load
+                    e.target.onerror = null;
+                    e.target.src = 'https://placehold.co/150x150?text=No+Image';
+                  }}
+                />
+              </div>
             </div>
             <div className="provider-info">
               <h3>{provider.name}</h3>

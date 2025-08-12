@@ -36,7 +36,7 @@ const ComplaintPage = () => {
   };
 
   const handleCancel = () => {
-    navigate(-1); // Go back to previous page
+    navigate('/home'); // Go back to home
   };
 
   if (isSubmitted) {
@@ -73,7 +73,7 @@ const ComplaintPage = () => {
           className="back-button"
           onClick={handleCancel}
         >
-          &larr; Back
+        <i className="fas fa-arrow-left"> Back</i>
         </button>
         <h1>File a Complaint</h1>
         <p className="page-description">

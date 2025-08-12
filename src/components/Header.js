@@ -1,4 +1,5 @@
-import React, { useState, useRef, useContext, useEffect } from 'react';
+import React, { useState, useRef, useContext, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
@@ -18,9 +19,15 @@ const Header = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const closeMobileMenu = () => {
+  const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
-  };
+  }, []);
+
+  // Close mobile menu when route changes
+  const location = useLocation();
+  useEffect(() => {
+    closeMobileMenu();
+  }, [location, closeMobileMenu]);
 
   const toggleProfileDropdown = () => {
     setShowProfileDropdown(!showProfileDropdown);
@@ -117,17 +124,20 @@ const Header = () => {
             <Link to="/services" className="nav-link" onClick={closeMobileMenu}>Services</Link>
             <Link to="/about" className="nav-link" onClick={closeMobileMenu}>About Us</Link>
             <Link to="/contact" className="nav-link" onClick={closeMobileMenu}>Contact</Link>
-            <Link to="/complaint" className="nav-link" onClick={closeMobileMenu}>File a Complaint</Link>
           </div>
 
           {/* Right side - profile and hamburger */}
           <div className="header-right">
-            <BusinessDropdown 
-              isAuthenticated={isAuthenticated} 
-              user={user} 
-              onLogout={handleLogout}
-            />
-            <Link to="/reviews" className="nav-link" id="nav-link2">Write a Review</Link>
+            <div className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              <BusinessDropdown 
+                isAuthenticated={isAuthenticated} 
+                user={user} 
+                onLogout={handleLogout}
+                isMobile={false}
+              />
+              <Link to="/reviews" className="nav-link" id="nav-link2">Write a Review</Link>
+              <Link to="/complaint" className="nav-link">File a Complaint</Link>
+            </div>
             
             {isAuthenticated ? (
               !user?.isServiceProvider && (
@@ -211,9 +221,21 @@ const Header = () => {
               <Link to="/about" className="nav-link" onClick={closeMobileMenu}>About Us</Link>
               <Link to="/contact" className="nav-link" onClick={closeMobileMenu}>Contact</Link>
               
+              {/* Moved links for mobile */}
+              <Link to="/reviews" className="nav-link" onClick={closeMobileMenu}>Write a Review</Link>
+              <Link to="/complaint" className="nav-link" onClick={closeMobileMenu}>File a Complaint</Link>
+              
+              {/* Always show BusinessDropdown in mobile menu */}
+              <BusinessDropdown 
+                isAuthenticated={isAuthenticated} 
+                user={user} 
+                onLogout={handleLogout}
+                isMobile={true}
+                closeMobileMenu={closeMobileMenu}
+              />
+              
               {isAuthenticated ? (
                 <>
-                  <Link to="/reviews" className="nav-link" onClick={closeMobileMenu}>Write a Review</Link>
                   <Link to="/profile" className="nav-link" onClick={closeMobileMenu}>My Profile</Link>
                   <button onClick={handleLogout} className="nav-link">Logout</button>
                 </>

@@ -6,7 +6,7 @@ import { MdDashboard } from 'react-icons/md';
 import { AuthContext } from '../context/AuthContext';
 import './BusinessDropdown.css';
 
-const BusinessDropdown = ({ isAuthenticated, user, onLogout }) => {
+const BusinessDropdown = ({ isAuthenticated, user, onLogout, isMobile = false, closeMobileMenu }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -37,7 +37,13 @@ const BusinessDropdown = ({ isAuthenticated, user, onLogout }) => {
 
   const handleItemClick = (path) => {
     closeDropdown();
-    navigate(path);
+    if (isMobile && closeMobileMenu) {
+      closeMobileMenu();
+    }
+    // Use a small timeout to ensure the menu closes before navigation
+    setTimeout(() => {
+      navigate(path);
+    }, 100);
   };
 
   // Close dropdown when clicking outside
@@ -48,6 +54,20 @@ const BusinessDropdown = ({ isAuthenticated, user, onLogout }) => {
       }
     };
 
+    // Close mobile menu when navigating away
+    const unlisten = () => {
+      if (isMobile && closeMobileMenu) {
+        closeMobileMenu();
+      }
+    };
+
+    // Add event listener for navigation
+    const unlistenToNavigation = window.addEventListener('popstate', unlisten);
+
+    return () => {
+      window.removeEventListener('popstate', unlisten);
+    };
+
     // Add event listener
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -56,19 +76,52 @@ const BusinessDropdown = ({ isAuthenticated, user, onLogout }) => {
     };
   }, []);
 
-  return (
-    <div className="business-dropdown" ref={dropdownRef}>
+  // Render different button styles for mobile and desktop
+  const renderButton = () => {
+    const buttonContent = (
+      <>
+        <IoBusiness className="business-icon" />
+        <span>{isMobile ? 'Business' : 'AAA For Business'}</span>
+        {!isMobile && <span className="dropdown-arrow">▼</span>}
+      </>
+    );
+
+    if (isMobile) {
+      return (
+        <div className="mobile-business-toggle">
+          <button 
+            className={`business-dropdown-toggle mobile ${isOpen ? 'active' : ''}`}
+            onClick={toggleDropdown}
+            aria-expanded={isOpen}
+            aria-label="Business menu"
+          >
+            {buttonContent}
+          </button>
+        </div>
+      );
+    }
+
+    return (
       <button 
-        className="business-dropdown-toggle" 
+        className={`business-dropdown-toggle ${isOpen ? 'active' : ''}`}
         onClick={toggleDropdown}
-        aria-haspopup="true"
         aria-expanded={isOpen}
+        aria-label="Business menu"
       >
-        AAA For Business
+        {buttonContent}
       </button>
+    );
+  };
+
+  // For mobile, we always want to show the dropdown content when the button is clicked
+  const showDropdown = isMobile ? isOpen : isOpen;
+
+  return (
+    <div className={`business-dropdown ${isMobile ? 'mobile' : ''} ${isOpen ? 'active' : ''}`} ref={dropdownRef}>
+      {renderButton()}
       
-      {isOpen && (
-        <div className="business-dropdown-menu">
+      {showDropdown && (
+        <div className={`business-dropdown-menu ${isMobile ? 'mobile' : ''}`}>
           {isAuthenticated ? (
             <>
               {hasBusiness ? (
@@ -122,20 +175,20 @@ const BusinessDropdown = ({ isAuthenticated, user, onLogout }) => {
             <>
               <Link 
                 to="/business/login" 
-                className="dropdown-item"
+                className="business-dropdown-item"
                 onClick={closeDropdown}
               >
                 <FaSignInAlt className="dropdown-icon" />
-                Business Login
+                <span>Business Login</span>
               </Link>
               <div className="dropdown-divider"></div>
               <Link 
                 to="/service-provider-signup" 
-                className="dropdown-item"
+                className="business-dropdown-item"
                 onClick={closeDropdown}
               >
                 <IoBusiness className="dropdown-icon" />
-                Register Business
+                <span>Register Business</span>
               </Link>
               <div className="dropdown-divider"></div>
              

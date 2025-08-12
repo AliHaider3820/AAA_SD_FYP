@@ -8,31 +8,35 @@
   line-height: 1.6;
 }
 
+.back-button-container {
+  margin-bottom: 20px;
+}
+
 .back-button {
-  background: none;
+  background-color: #f0f0f0;
   border: 1px solid #ddd;
-  color: #2c3e50;
-  font-size: 0.95rem;
+  color: #333;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  margin-bottom: 25px;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: all 0.2s ease;
   text-decoration: none;
+  gap: 8px;
 }
 
 .back-button:hover {
-  background-color: #f8f9fa;
-  border-color: #bbb;
-  transform: translateY(-1px);
+  background-color: #e0e0e0;
+  border-color: #ccc;
+  transform: none;
 }
 
 .back-button i {
-  margin-right: 8px;
-  font-size: 1.1em;
+  margin: 0;
+  font-size: 0.9em;
 }
 
 .profile-header {

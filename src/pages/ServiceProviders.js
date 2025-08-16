@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import serviceProviders from '../data/serviceProviders';
 import './ServiceProviders.css';
 
@@ -13,6 +14,7 @@ const ServiceProviders = () => {
   const [serviceTitle, setServiceTitle] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   // Update filtered providers when search term or providers change
   useEffect(() => {
@@ -219,6 +221,78 @@ const ServiceProviders = () => {
                 <i className="fas fa-map-marker-alt"></i> {provider.location}
               </p>
               <p className="description">{provider.description}</p>
+              <div className="provider-actions" style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
+                <button 
+                  className="ask-question-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isAuthenticated) {
+                      // Show login message and redirect to login page
+                      if (window.confirm('Please login to ask a question. Would you like to login now?')) {
+                        navigate('/login', { state: { from: `/provider/${serviceId}/${provider.id}?tab=contact` } });
+                      }
+                      return;
+                    }
+                    // Navigate to provider's contact form or open a modal
+                    navigate(`/provider/${serviceId}/${provider.id}?tab=contact`);
+                  }}
+                  style={{
+                    backgroundColor: '#4a6cf7',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    transition: 'background-color 0.2s',
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#3a5bd9'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4a6cf7'}
+                >
+                  <i className="fas fa-question-circle"></i>
+                  Ask Question
+                </button>
+                <button 
+                  className="view-profile-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/provider/${serviceId}/${provider.id}`);
+                  }}
+                  style={{
+                    backgroundColor: 'white',
+                    color: '#4a6cf7',
+                    border: '1px solid #4a6cf7',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8f9ff';
+                    e.currentTarget.style.color = '#3a5bd9';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white';
+                    e.currentTarget.style.color = '#4a6cf7';
+                  }}
+                >
+                  <i className="fas fa-user"></i>
+                  View Profile
+                </button>
+              </div>
             </div>
           </div>
         ))}

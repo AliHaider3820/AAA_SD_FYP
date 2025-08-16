@@ -30,6 +30,7 @@ const BusinessDashboard = lazy(() => import('./pages/BusinessDashboard'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const ComplaintPage = lazy(() => import('./pages/ComplaintPage'));
+const Inbox = lazy(() => import('./components/Inbox'));
 
 // Guest route component to redirect authenticated users
 const GuestRoute = ({ children }) => {
@@ -109,6 +110,11 @@ const AppContent = () => {
           <Route path="/business/profile" element={
             <PrivateRoute requiredUserType="business">
               <BusinessProfile />
+            </PrivateRoute>
+          } />
+          <Route path="/business/inbox" element={
+            <PrivateRoute requiredUserType="business">
+              <Inbox />
             </PrivateRoute>
           } />
           <Route path="/edit-business/:businessId" element={

@@ -82,7 +82,7 @@ const BusinessDropdown = ({ isAuthenticated, user, onLogout, isMobile = false, c
       <>
         <IoBusiness className="business-icon" />
         <span>{isMobile ? 'Business' : 'AAA For Business'}</span>
-        {!isMobile && <span className="dropdown-arrow">▼</span>}
+
       </>
     );
 

@@ -235,10 +235,14 @@ const Header = () => {
               />
               
               {isAuthenticated ? (
-                <>
-                  <Link to="/profile" className="nav-link" onClick={closeMobileMenu}>My Profile</Link>
-                  <button onClick={handleLogout} className="nav-link">Logout</button>
-                </>
+                <div className="profile-mobile-options">
+                  <Link to="/profile" className="nav-link" onClick={closeMobileMenu}>
+                    <FaUserCircle className="mobile-nav-icon" /> My Profile
+                  </Link>
+                  <button onClick={handleLogout} className="nav-link">
+                    <FaSignOutAlt className="mobile-nav-icon" /> Logout
+                  </button>
+                </div>
               ) : (
                 <div className="mobile-auth-buttons">
                   <Link to="/login" className="nav-link" onClick={closeMobileMenu}>Login</Link>

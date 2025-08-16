@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useContext } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import serviceProviders from '../data/serviceProviders';
 import './ProviderProfile.css';
+import InquiryForm from '../components/InquiryForm';
 
 // Mock reviews data structure
 const mockReviews = {
@@ -20,12 +22,58 @@ const mockProviders = serviceProviders;
 
 const ProviderProfile = () => {
   const { serviceId, providerId } = useParams();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [provider, setProvider] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [newReview, setNewReview] = useState({ name: '', rating: 5, comment: '' });
-  const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  
+  // Check for tab=contact in URL when component mounts
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('tab') === 'contact') {
+      showInquiryFormModal();
+    }
+  }, [location.search]);
+  
+  const showInquiryFormModal = () => {
+    // Check if user is logged in
+    const authUser = currentUser || JSON.parse(localStorage.getItem('currentUser') || 'null');
+    
+    if (!authUser) {
+      alert('Please log in to send an inquiry.');
+      navigate('/login', { 
+        state: { from: window.location.pathname },
+        replace: true
+      });
+      return false;
+    }
+    
+    setShowInquiryForm(true);
+    return true;
+  };
+  
+  const handleInquiryClick = (e) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      // Show login message and redirect to login page
+      if (window.confirm('Please login to ask a question. Would you like to login now?')) {
+        navigate('/login', { state: { from: location.pathname } });
+      }
+      return;
+    }
+    showInquiryFormModal();
+  };
+  
+  const handleInquirySuccess = () => {
+    setShowInquiryForm(false);
+    alert('Your inquiry has been sent successfully!');
+  };
 
   useEffect(() => {
     const fetchData = () => {
@@ -215,9 +263,14 @@ const ProviderProfile = () => {
             <a href={`tel:${provider.phone}`}>{provider.phone}</a>
           </div>
           
-          <button className="contact-button">
-            <i className="fas fa-envelope"></i> Contact Provider
-          </button>
+          <div className="button-group" style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+            <button className="contact-button" onClick={handleInquiryClick}>
+              <i className="fas fa-question-circle"></i> Ask a Question
+            </button>
+            <a href={`tel:${provider.phone}`} className="phone-button">
+              <i className="fas fa-phone"></i> Call Now
+            </a>
+          </div>
         </div>
       </div>
       
@@ -336,6 +389,58 @@ const ProviderProfile = () => {
           )}
         </div>
       </div>
+      
+      {showInquiryForm && (
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowInquiryForm(false)}>
+          <div className="modal-content" style={{
+            backgroundColor: 'white',
+            padding: '25px',
+            borderRadius: '12px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            position: 'relative'
+          }} onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setShowInquiryForm(false)}
+              style={{
+                position: 'absolute',
+                top: '15px',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+                color: '#666',
+                padding: '5px'
+              }}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <InquiryForm
+              serviceProviderId={provider.id}
+              serviceId={serviceId}
+              serviceName={provider.services && provider.services.length > 0 ? provider.services[0] : 'Service'}
+              onClose={() => setShowInquiryForm(false)}
+              onSuccess={handleInquirySuccess}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

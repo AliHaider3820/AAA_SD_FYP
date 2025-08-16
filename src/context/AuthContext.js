@@ -74,6 +74,9 @@ export const AuthProvider = ({ children }) => {
       setUser(loggedInUser);
       setUserType(loggedInUser.isServiceProvider ? 'business' : 'client');
       setIsAuthenticated(true);
+      
+      // Save user data to localStorage for persistence
+      localStorage.setItem('currentUser', JSON.stringify(loggedInUser));
 
       return true;
     } catch (error) {

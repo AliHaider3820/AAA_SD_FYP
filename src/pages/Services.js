@@ -360,7 +360,7 @@ const Services = () => {
           <div style={{ position: 'relative', minWidth: '250px', flex: '1' }}>
             <input
               type="text"
-              placeholder="Search services..."
+              placeholder="Search services by catogries..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{

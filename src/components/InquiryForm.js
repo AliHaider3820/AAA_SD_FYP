@@ -1,0 +1,191 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import './InquiryForm.css';
+
+const InquiryForm = ({ serviceProviderId, serviceId, serviceName, onClose, onSuccess }) => {
+  const { currentUser } = useAuth();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  // Pre-fill form if user is logged in
+  useEffect(() => {
+    if (currentUser) {
+      setFormData(prev => ({
+        ...prev,
+        name: currentUser.displayName || '',
+        email: currentUser.email || '',
+        phone: currentUser.phoneNumber || ''
+      }));
+    }
+  }, [currentUser]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setError('Please enter your name');
+      return false;
+    }
+    if (!formData.email.trim()) {
+      setError('Please enter your email');
+      return false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    if (!formData.phone.trim()) {
+      setError('Please enter your phone number');
+      return false;
+    }
+    if (!formData.message.trim()) {
+      setError('Please enter your message');
+      return false;
+    }
+    return true;
+  };
+
+  const sendEmailNotification = async (inquiryData) => {
+    // In a real app, this would be an API call to your backend
+    console.log('Sending email notification:', inquiryData);
+    // Simulate API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log('Email notification sent to service provider');
+        resolve(true);
+      }, 1000);
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    try {
+      const newInquiry = {
+        id: Date.now().toString(),
+        serviceProviderId,
+        serviceId,
+        serviceName,
+        userId: currentUser?.uid || 'anonymous',
+        userName: formData.name.trim(),
+        userEmail: formData.email.trim(),
+        userPhone: formData.phone.trim(),
+        message: formData.message.trim(),
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        isRead: false
+      };
+
+      // Save to localStorage
+      const existingInquiries = JSON.parse(localStorage.getItem('inquiries') || '[]');
+      localStorage.setItem('inquiries', JSON.stringify([...existingInquiries, newInquiry]));
+      
+      // Send email notification (simulated)
+      await sendEmailNotification(newInquiry);
+      
+      if (onSuccess) onSuccess();
+      if (onClose) onClose();
+    } catch (err) {
+      setError('Failed to send inquiry. Please try again.');
+      console.error('Error submitting inquiry:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="inquiry-form-container">
+      <h3>Send Inquiry</h3>
+      {error && <div className="error-message">{error}</div>}
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">Full Name *</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Enter your name"
+            required
+            disabled={!!currentUser}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="email">Email *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="your.email@example.com"
+            required
+            disabled={!!currentUser}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="phone">Phone Number *</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="0300-1234567"
+            required
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="message">Your Message *</label>
+          <textarea
+            id="message"
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            rows="4"
+            required
+            placeholder={`I'm interested in ${serviceName}. Please provide more details.`}
+          />
+        </div>
+        <div className="form-actions">
+          <button 
+            type="button" 
+            onClick={onClose} 
+            disabled={isSubmitting}
+            className="btn btn-outline"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            disabled={isSubmitting || !formData.message.trim() || !formData.name.trim() || !formData.email.trim() || !formData.phone.trim()}
+            className="btn btn-primary"
+          >
+            {isSubmitting ? 'Sending...' : 'Send Inquiry'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default InquiryForm;

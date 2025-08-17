@@ -41,12 +41,9 @@ const InquiryForm = ({ serviceProviderId, serviceId, serviceName, onClose, onSuc
     if (!formData.email.trim()) {
       setError('Please enter your email');
       return false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Please enter a valid email address');
-      return false;
     }
-    if (!formData.phone.trim()) {
-      setError('Please enter your phone number');
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      setError('Please enter a valid email address');
       return false;
     }
     if (!formData.message.trim()) {
@@ -81,14 +78,15 @@ const InquiryForm = ({ serviceProviderId, serviceId, serviceName, onClose, onSuc
         serviceProviderId,
         serviceId,
         serviceName,
-        userId: currentUser?.uid || 'anonymous',
+        userId: currentUser?.uid || 'guest_' + Date.now(),
         userName: formData.name.trim(),
         userEmail: formData.email.trim(),
-        userPhone: formData.phone.trim(),
+        userPhone: formData.phone.trim() || 'Not provided',
         message: formData.message.trim(),
         status: 'pending',
         createdAt: new Date().toISOString(),
-        isRead: false
+        isRead: false,
+        isGuest: !currentUser
       };
 
       // Save to localStorage
@@ -110,11 +108,14 @@ const InquiryForm = ({ serviceProviderId, serviceId, serviceName, onClose, onSuc
 
   return (
     <div className="inquiry-form-container">
-      <h3>Send Inquiry</h3>
+      <h2>Send Inquiry</h2>
+      <p className="inquiry-form-subtitle">Ask a question about {serviceName}</p>
+      
       {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleSubmit}>
+      
+      <form onSubmit={handleSubmit} className="inquiry-form">
         <div className="form-group">
-          <label htmlFor="name">Full Name *</label>
+          <label htmlFor="name">Your Name *</label>
           <input
             type="text"
             id="name"
@@ -123,34 +124,31 @@ const InquiryForm = ({ serviceProviderId, serviceId, serviceName, onClose, onSuc
             onChange={handleChange}
             placeholder="Enter your name"
             required
-            disabled={!!currentUser}
           />
         </div>
         
         <div className="form-group">
-          <label htmlFor="email">Email *</label>
+          <label htmlFor="email">Email Address *</label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="your.email@example.com"
+            placeholder="Enter your email"
             required
-            disabled={!!currentUser}
           />
         </div>
         
         <div className="form-group">
-          <label htmlFor="phone">Phone Number *</label>
+          <label htmlFor="phone">Phone Number</label>
           <input
             type="tel"
             id="phone"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            placeholder="0300-1234567"
-            required
+            placeholder="Enter your phone number (optional)"
           />
         </div>
         

@@ -42,31 +42,12 @@ const ProviderProfile = () => {
   }, [location.search]);
   
   const showInquiryFormModal = () => {
-    // Check if user is logged in
-    const authUser = currentUser || JSON.parse(localStorage.getItem('currentUser') || 'null');
-    
-    if (!authUser) {
-      alert('Please log in to send an inquiry.');
-      navigate('/login', { 
-        state: { from: window.location.pathname },
-        replace: true
-      });
-      return false;
-    }
-    
     setShowInquiryForm(true);
     return true;
   };
   
   const handleInquiryClick = (e) => {
     e.stopPropagation();
-    if (!isAuthenticated) {
-      // Show login message and redirect to login page
-      if (window.confirm('Please login to ask a question. Would you like to login now?')) {
-        navigate('/login', { state: { from: location.pathname } });
-      }
-      return;
-    }
     showInquiryFormModal();
   };
   

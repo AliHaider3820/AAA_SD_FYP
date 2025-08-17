@@ -15,13 +15,13 @@ const Header = () => {
   const overlayRef = useRef(null);
   const { isAuthenticated, logout, user } = useContext(AuthContext);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
   const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
   }, []);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   // Close mobile menu when route changes
   const location = useLocation();
@@ -63,7 +63,7 @@ const Header = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [closeMobileMenu]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -89,7 +89,7 @@ const Header = () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, closeMobileMenu]);
 
   return (
     <header className="header">
@@ -136,7 +136,7 @@ const Header = () => {
                 isMobile={false}
               />
               <Link to="/reviews" className="nav-link" id="nav-link2">Write a Review</Link>
-              <Link to="/complaint" className="nav-link">File a Complaint</Link>
+              <Link to="/complaint" className="nav-link"id="nav-link2">File a Complaint</Link>
             </div>
             
             {isAuthenticated ? (

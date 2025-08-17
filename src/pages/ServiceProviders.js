@@ -226,14 +226,7 @@ const ServiceProviders = () => {
                   className="ask-question-btn"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (!isAuthenticated) {
-                      // Show login message and redirect to login page
-                      if (window.confirm('Please login to ask a question. Would you like to login now?')) {
-                        navigate('/login', { state: { from: `/provider/${serviceId}/${provider.id}?tab=contact` } });
-                      }
-                      return;
-                    }
-                    // Navigate to provider's contact form or open a modal
+                    // Navigate directly to provider's contact form
                     navigate(`/provider/${serviceId}/${provider.id}?tab=contact`);
                   }}
                   style={{

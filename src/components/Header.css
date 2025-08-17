@@ -1473,8 +1473,9 @@
   #nav-link2{
     display: none;
   }
-  .nav-link{
-    display: none;
+  /* Navigation links are now visible on all screen sizes */
+  .nav-link {
+    display: inline-block;
   }
   .business-dropdown-toggle::after{
     display: block;

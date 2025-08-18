@@ -13,25 +13,50 @@ const ServiceProviders = () => {
   const [loading, setLoading] = useState(true);
   const [serviceTitle, setServiceTitle] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState('reviews'); // Default sort by reviews
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-
-  // Update filtered providers when search term or providers change
+  
+  // Sort function for providers
+  const sortProviders = (providers, option) => {
+    if (!providers || !providers.length) return [];
+    
+    return [...providers].sort((a, b) => {
+      switch(option) {
+        case 'reviews':
+          return (b.reviews || 0) - (a.reviews || 0);
+        case 'alphabetical':
+          return a.name.localeCompare(b.name);
+        case 'newest':
+          return (b.id || 0) - (a.id || 0);
+        case 'oldest':
+          return (a.id || 0) - (b.id || 0);
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+        default:
+          return 0;
+      }
+    });
+  };
+  
+  // Update filtered and sorted providers when search term, providers, or sort option changes
   useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredProviders(providers);
-    } else {
-      const filtered = providers.filter(provider =>
-        provider.location.toLowerCase().includes(searchTerm.toLowerCase())
+    let result = [...providers];
+    
+    // Apply search filter
+    if (searchTerm.trim() !== '') {
+      result = result.filter(provider =>
+        provider.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (provider.name && provider.name.toLowerCase().includes(searchTerm.toLowerCase()))
       );
-      setFilteredProviders(filtered);
     }
-  }, [searchTerm, providers]);
+    
+    // Apply sorting
+    result = sortProviders(result, sortOption);
+    
+    setFilteredProviders(result);
+  }, [searchTerm, providers, sortOption]);
 
-  // Initialize filtered providers when providers are loaded
-  useEffect(() => {
-    setFilteredProviders(providers);
-  }, [providers]);
 
   // Get service title based on ID
   const getServiceTitle = (id) => {
@@ -137,7 +162,30 @@ const ServiceProviders = () => {
         <h1 style={{ color: '#2c3e50', fontSize: '2rem', margin: 0 }}>
           {serviceTitle} Providers
         </h1>
-        <div style={{ position: 'relative', minWidth: '300px', flex: '1', maxWidth: '400px' }}>
+        <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', flex: '1', justifyContent: 'flex-end' }}>
+          <div style={{ position: 'relative', minWidth: '200px', flex: '1' }}>
+            <select 
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              style={{
+                padding: '10px 15px',
+                borderRadius: '6px',
+                border: '1px solid #ddd',
+                fontSize: '1rem',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                backgroundColor: 'white',
+                cursor: 'pointer',
+                width: '100%'
+              }}
+            >
+              <option value="reviews">Sort by: Most Reviews</option>
+              <option value="rating">Sort by: Highest Rating</option>
+              <option value="alphabetical">Sort by: A-Z</option>
+              <option value="newest">Sort by: Newest</option>
+              <option value="oldest">Sort by: Oldest</option>
+            </select>
+          </div>
+          <div style={{ position: 'relative', minWidth: '250px', flex: '1' }}>
           <input
             type="text"
             placeholder="Search by location..."
@@ -160,6 +208,7 @@ const ServiceProviders = () => {
             transform: 'translateY(-50%)',
             color: '#666'
           }}></i>
+          </div>
         </div>
       </div>
       
@@ -204,18 +253,26 @@ const ServiceProviders = () => {
             <div className="provider-info">
               <h3>{provider.name}</h3>
               <div className="provider-stats">
-                <span className="rating">
-                  {[...Array(5)].map((_, i) => (
-                    <i 
-                      key={i} 
-                      className={`fas fa-star ${i < Math.floor(provider.rating) ? 'filled' : ''}`}
-                    ></i>
-                  ))}
-                  {provider.rating % 1 !== 0 && <i className="fas fa-star-half-alt"></i>}
-                  <span className="rating-number">({provider.rating})</span>
-                </span>
-                <span className="experience">{provider.experience} experience</span>
-                <span className="views">({provider.views}) views</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <span className="rating">
+                    {[...Array(5)].map((_, i) => (
+                      <i 
+                        key={i} 
+                        className={`fas fa-star ${i < Math.floor(provider.rating) ? 'filled' : ''}`}
+                      ></i>
+                    ))}
+                    {provider.rating % 1 !== 0 && <i className="fas fa-star-half-alt"></i>}
+                    <span className="rating-number">({provider.rating})</span>
+                  </span>
+                </div>
+                  <span className="views">({provider.views?.toLocaleString() || '0'}) views</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span className="experience">{provider.experience} experience</span>
+                  <span className="review-count" style={{ color: '#666', fontSize: '0.9rem' }}>
+                  <i className="fas fa-comment-alt" style={{ marginRight: '10px' }}></i>
+                  {provider.reviews?.toLocaleString() || '0'} reviews
+                  </span>
+                </div>
               </div>
               <p className="location">
                 <i className="fas fa-map-marker-alt"></i> {provider.location}

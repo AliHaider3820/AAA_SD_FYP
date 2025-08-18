@@ -1,281 +1,115 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import serviceProvidersData from '../data/serviceProviders';
 import servicesData from '../data/services';
+import LocationBasedSearch from '../components/LocationBasedSearch';
 import './Services.css';
 
 const Services = () => {
   const navigate = useNavigate();
   const [locationQuery, setLocationQuery] = useState('');
   const [matchingProviders, setMatchingProviders] = useState([]);
+  const [showLocationResults, setShowLocationResults] = useState(false);
+  const [categorySearchTerm, setCategorySearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState('reviews'); // Default sort by reviews
   
   const handleServiceClick = useCallback((serviceId) => {
     navigate(`/service-providers/${serviceId}`);
   }, [navigate]);
 
+  const handleLocationSearch = useCallback((providers, searchTerm) => {
+    console.log('Location search results:', providers);
+    // Log each provider's serviceId and name for debugging
+    providers.forEach(p => {
+      console.log(`Provider: ${p.name}, Service ID: ${p.serviceId}, Type: ${typeof p.serviceId}`);
+    });
+    setShowLocationResults(providers.length > 0);
+    setMatchingProviders(providers);
+    setLocationQuery(searchTerm);
+  }, []);
+
   // Use the imported services data
   const services = servicesData;
+  
+  // Create a function to get category by checking multiple possible fields
+  const getServiceCategory = useCallback((serviceId, provider) => {
+    // Debug log to see the full provider object
+    console.log('Provider data:', {
+      name: provider?.name,
+      serviceId: provider?.serviceId,
+      serviceCategory: provider?.serviceCategory,
+      categoryName: provider?.categoryName,
+      providerData: provider // Log the full provider object for debugging
+    });
+    
+    // First try to get category from provider's categoryName field (if it exists)
+    if (provider?.categoryName) {
+      return provider.categoryName;
+    }
+    
+    // Then try serviceCategory field
+    if (provider?.serviceCategory) {
+      // If serviceCategory is a number, look up the category name
+      if (typeof provider.serviceCategory === 'number' || !isNaN(provider.serviceCategory)) {
+        const id = typeof provider.serviceCategory === 'string' 
+          ? parseInt(provider.serviceCategory, 10) 
+          : provider.serviceCategory;
+          
+        const service = servicesData.find(s => s.id === id);
+        if (service) return service.category;
+      }
+      // If serviceCategory is a string, use it directly
+      return provider.serviceCategory;
+    }
+    
+    // Fall back to serviceId if other fields are not available
+    if (serviceId === undefined || serviceId === null) return 'Service Category';
+    
+    // Convert serviceId to number if it's a string
+    const id = typeof serviceId === 'string' ? parseInt(serviceId, 10) : serviceId;
+    
+    // Find the service with matching ID
+    const service = servicesData.find(s => s.id === id);
+    
+    // Return the category from the service, or a default value
+    return service?.category || 'Service Category';
+  }, []); // servicesData is not needed as a dependency since it's only used inside the callback
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
 
-  // Get all providers from both static data and localStorage
-  const getAllProviders = useCallback(() => {
-    try {
-      // Get providers from localStorage
-      const localStorageData = localStorage.getItem('serviceProviders');
-      console.log('Raw localStorage data:', localStorageData);
-      
-      const localProviders = localStorageData ? JSON.parse(localStorageData) : {};
-      console.log('Parsed local providers:', localProviders);
-      
-      // Create a deep copy of static providers to avoid modifying the original
-      const combinedProviders = JSON.parse(JSON.stringify(serviceProvidersData));
-      
-      // Check if localProviders is an array (direct array of providers)
-      if (Array.isArray(localProviders)) {
-        console.log('Found array of providers in localStorage');
-        // If it's an array, add all providers to a default service (e.g., 1 for first service)
-        if (!combinedProviders[1]) combinedProviders[1] = [];
-        localProviders.forEach(provider => {
-          if (provider && !combinedProviders[1].some(p => p.id === provider.id || p.name === provider.name)) {
-            combinedProviders[1].push(provider);
-          }
-        });
-      } 
-      // Handle object structure {serviceId: [providers]}
-      else if (typeof localProviders === 'object' && localProviders !== null) {
-        console.log('Processing providers by service ID');
-        Object.entries(localProviders).forEach(([serviceId, providersForService]) => {
-          const serviceIdNum = parseInt(serviceId);
-          if (isNaN(serviceIdNum)) return;
-          
-          // Initialize array for this service ID if it doesn't exist
-          if (!combinedProviders[serviceIdNum]) {
-            combinedProviders[serviceIdNum] = [];
-          }
-          
-          // Handle array of providers
-          if (Array.isArray(providersForService)) {
-            console.log(`Found ${providersForService.length} providers for service ${serviceId}`);
-            providersForService.forEach(provider => {
-              if (!provider) return;
-              const exists = combinedProviders[serviceIdNum].some(p => 
-                (p.id && p.id === provider.id) || 
-                (p.name && p.name === provider.name)
-              );
-              if (!exists) {
-                combinedProviders[serviceIdNum].push(provider);
-              }
-            });
-          } 
-          // Handle single provider object
-          else if (typeof providersForService === 'object' && providersForService !== null) {
-            console.log('Found single provider object');
-            const providerArray = Object.values(providersForService).filter(Boolean);
-            providerArray.forEach(provider => {
-              const exists = combinedProviders[serviceIdNum].some(p => 
-                (p.id && p.id === provider.id) || 
-                (p.name && p.name === provider.name)
-              );
-              if (!exists) {
-                combinedProviders[serviceIdNum].push(provider);
-              }
-            });
-          }
-        });
-      }
-      
-      // Log the final combined providers for debugging
-      console.log('Final combined providers by service ID:');
-      Object.entries(combinedProviders).forEach(([id, providers]) => {
-        console.log(`Service ${id} has ${Array.isArray(providers) ? providers.length : 'invalid'} providers`);
-      });
-      
-      return combinedProviders;
-    } catch (error) {
-      console.error('Error loading providers:', error);
-      return serviceProvidersData; // Fallback to static data
-    }
-  }, []);
-
-  // Update matching providers when location query changes
-  useEffect(() => {
-    const searchTerm = locationQuery.trim().toLowerCase();
+  // Sort and filter providers based on selected option
+  const sortProviders = (providers, option) => {
+    if (!providers || !providers.length) return [];
     
-    if (!searchTerm) {
-      setMatchingProviders([]);
-      return;
-    }
-
-    console.log('Searching for location:', searchTerm);
-    const allProviders = getAllProviders();
-    console.log('All providers by service ID:', allProviders);
-    
-    const matches = [];
-    const seenProviderIds = new Set();
-
-    // Find all providers matching the location across all services
-    Object.entries(allProviders).forEach(([serviceId, serviceProviders]) => {
-      if (!Array.isArray(serviceProviders)) {
-        console.log(`Skipping non-array providers for service ${serviceId}`);
-        return;
+    return [...providers].sort((a, b) => {
+      switch(option) {
+        case 'reviews':
+          return (b.reviews || 0) - (a.reviews || 0);
+        case 'alphabetical':
+          return a.name.localeCompare(b.name);
+        case 'newest':
+          return (b.id || 0) - (a.id || 0);
+        case 'oldest':
+          return (a.id || 0) - (b.id || 0);
+        default:
+          return 0;
       }
-      
-      console.log(`Checking ${serviceProviders.length} providers for service ${serviceId}`);
-      
-      serviceProviders.forEach((provider, index) => {
-        try {
-          // Skip if provider is invalid or missing required fields
-          if (!provider || !provider.id || !provider.name) {
-            console.log(`Skipping invalid provider at index ${index}:`, provider);
-            return;
-          }
-
-          // Skip duplicate providers
-          if (seenProviderIds.has(provider.id)) {
-            console.log(`Skipping duplicate provider ID: ${provider.id}`);
-            return;
-          }
-          seenProviderIds.add(provider.id);
-          
-          // Ensure provider has a valid serviceId
-          const validServiceId = provider.serviceId || serviceId;
-          if (!validServiceId) {
-            console.log('Skipping provider with no service ID:', provider);
-            return;
-          }
-          
-          // Ensure provider has at least one image source
-          const hasImage = Boolean(provider.image || provider.profileImage || provider.avatar);
-          
-          // Log provider details for debugging
-          console.log(`Checking provider ${index + 1}:`, {
-            id: provider.id,
-            name: provider.name,
-            hasImage,
-            serviceId: validServiceId
-          });
-          
-          // Get all possible location fields and clean them up
-          const locationFields = [
-            provider.location,
-            provider.address,
-            provider.city,
-            provider.area,
-            provider.officeLocation,
-            provider.contact?.address,
-            provider.profile?.location,
-            provider.contact?.city,
-            provider.contact?.state,
-            provider.contact?.zipCode
-          ].filter(Boolean); // Remove falsy values
-          
-          console.log('Location fields:', locationFields);
-          
-          // Check if any location field contains the search term
-          const locationMatch = locationFields.some(field => {
-            if (!field) return false;
-            const fieldText = String(field).toLowerCase().trim();
-            return fieldText.includes(searchTerm);
-          });
-          
-          // For debugging, get the first non-empty location
-          const locationText = locationFields.find(Boolean);
-          
-          if (locationMatch) {
-            console.log(`Match found for provider ${provider.name} (${provider.id})`);
-            console.log('Matching location fields:', locationFields);
-            
-            // Create a normalized provider object with all required fields
-            const normalizedProvider = {
-              id: provider.id,
-              name: provider.name || 'Service Provider',
-              rating: provider.rating || 0,
-              experience: provider.experience || 'Not specified',
-              phone: provider.phone || provider.contactNumber || 'Not provided',
-              location: provider.location || provider.address || 'Location not specified',
-              description: provider.description || provider.about || 'No description available',
-              serviceId: validServiceId,
-              // Image sources - check all possible image field names
-              image: provider.image || provider.profileImage || provider.profilePicture || provider.avatar,
-              // Additional fields
-              ...provider
-            };
-            
-            // Add debug information
-            console.log('Added provider to matches:', {
-              name: normalizedProvider.name,
-              location: normalizedProvider.location,
-              serviceId: normalizedProvider.serviceId
-            });
-            
-            matches.push(normalizedProvider);
-          } else {
-            console.log('No match for provider:', {
-              name: provider.name,
-              locationFields,
-              searchTerm,
-              hasLocationFields: locationFields.length > 0
-            });
-          }
-        } catch (error) {
-          console.error('Error processing provider:', {
-            error: error.message,
-            provider,
-            serviceId
-          }, error);
-        }
-      });
     });
-
-    console.log(`Found ${matches.length} matching providers for "${searchTerm}":`, matches);
-    
-    // Sort matches by rating (highest first) and then by name
-    const sortedMatches = [...matches].sort((a, b) => {
-      // First sort by rating (descending)
-      if (b.rating !== a.rating) {
-        return (b.rating || 0) - (a.rating || 0);
-      }
-      // If ratings are equal, sort by name (ascending)
-      return (a.name || '').localeCompare(b.name || '');
-    });
-    
-    console.log('Setting matching providers:', sortedMatches);
-    setMatchingProviders(sortedMatches);
-  }, [locationQuery, getAllProviders]);
-
-  // Function to check if a service has providers in the specified location
-  // (This function is kept for potential future use)
-  // const hasProvidersInLocation = (serviceId) => {
-  //   // If no location query, show all services
-  //   if (!locationQuery.trim()) return true;
-    
-  //   // If we have matching providers, only show services that have matching providers
-  //   if (matchingProviders.length > 0) {
-  //     return matchingProviders.some(p => p.serviceId === serviceId);
-  //   }
-    
-  //   // If no matching providers, don't show any services
-  //   return false;
-  // };
+  };
 
   // Filter services based on search term and selected category
   const filteredServices = useMemo(() => {
-    // If there's a location query, show all services that have providers in that location
-    if (locationQuery.trim()) {
-      // Get unique service IDs from matching providers
+    // If there are matching providers from location search, filter services to only show those with providers
+    if (showLocationResults && matchingProviders.length > 0) {
       const serviceIdsWithProviders = [...new Set(matchingProviders.map(p => p.serviceId))];
       
       return services.filter(service => {
-        // Only include services that have providers in the searched location
         const hasMatchingProviders = serviceIdsWithProviders.includes(service.id);
-        
-        // Apply other filters (search term and category)
         const matchesSearch = searchTerm === '' || 
                            service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            service.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           service.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                           (service.tags && service.tags.some(tag => 
+                             tag.toLowerCase().includes(searchTerm.toLowerCase())));
         
         const matchesCategory = !selectedCategory || service.category === selectedCategory;
         
@@ -283,18 +117,19 @@ const Services = () => {
       });
     }
     
-    // If no location query, filter normally
+    // Default filter when no location search is active
     return services.filter(service => {
       const matchesSearch = searchTerm === '' || 
                          service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          service.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         service.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                         (service.tags && service.tags.some(tag => 
+                           tag.toLowerCase().includes(searchTerm.toLowerCase())));
       
       const matchesCategory = !selectedCategory || service.category === selectedCategory;
       
       return matchesSearch && matchesCategory;
     });
-  }, [services, searchTerm, selectedCategory, matchingProviders, locationQuery]);
+  }, [services, searchTerm, selectedCategory, matchingProviders, showLocationResults]); // Removed categorySearchTerm and getServiceCategory as they are not used in the dependency calculation
 
   return (
     <div className="services-page">
@@ -316,90 +151,30 @@ const Services = () => {
         </h1>
         <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', flex: '1' }}>
           <div style={{ position: 'relative', minWidth: '250px', flex: '1' }}>
-            <input
-              type="text"
-              placeholder="Search by location..."
-              value={locationQuery}
-              onChange={(e) => setLocationQuery(e.target.value)}
+            <LocationBasedSearch onLocationSearch={handleLocationSearch} />
+          </div>
+          <div className="sort-filter" style={{ minWidth: '200px' }}>
+            <select 
+              className="sort-select"
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
               style={{
-                width: '100%',
                 padding: '10px 15px',
-                paddingLeft: '40px',
                 borderRadius: '6px',
                 border: '1px solid #ddd',
                 fontSize: '1rem',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                backgroundColor: 'white',
+                cursor: 'pointer',
+                width: '100%'
               }}
-            />
-            <i className="fas fa-map-marker-alt" style={{
-              position: 'absolute',
-              left: '15px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#666'
-            }}></i>
-            {locationQuery && (
-              <button 
-                onClick={() => setLocationQuery('')}
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: '#666',
-                  cursor: 'pointer',
-                  fontSize: '1.2rem'
-                }}
-              >
-                ×
-              </button>
-            )}
+            >
+              <option value="reviews">Sort by: Most Reviews</option>
+              <option value="alphabetical">Sort by: A-Z</option>
+              <option value="newest">Sort by: Newest</option>
+              <option value="oldest">Sort by: Oldest</option>
+            </select>
           </div>
-          <div style={{ position: 'relative', minWidth: '250px', flex: '1' }}>
-            <input
-              type="text"
-              placeholder="Search services by catogries..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 15px',
-                paddingLeft: '40px',
-                borderRadius: '6px',
-                border: '1px solid #ddd',
-                fontSize: '1rem',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-              }}
-            />
-            <i className="fas fa-search" style={{
-              position: 'absolute',
-              left: '15px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#666'
-            }}></i>
-            {searchTerm && (
-              <button 
-                onClick={() => setSearchTerm('')}
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: '#666',
-                  cursor: 'pointer',
-                  fontSize: '1.2rem'
-                }}
-              >
-                ×
-              </button>
-            )}
-          </div>
-          
           <div className="category-filter" style={{ minWidth: '200px' }}>
             <select 
               className="category-select"
@@ -431,15 +206,119 @@ const Services = () => {
         </div>
       </div>
 
-      {locationQuery.trim() && matchingProviders.length > 0 ? (
-        <>
+      {showLocationResults ? (
+        <div className="providers-container">
           <div className="providers-header">
             <h3>Providers in: <span className="location-highlight">{locationQuery}</span></h3>
             <p>{matchingProviders.length} service providers found in this location</p>
+            
+            {/* Category Search Bar */}
+            <div style={{ margin: '20px 0', maxWidth: '500px', width: '100%' }}>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  placeholder="Filter by category..."
+                  value={categorySearchTerm}
+                  onChange={(e) => setCategorySearchTerm(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 15px',
+                    paddingLeft: '40px',
+                    borderRadius: '6px',
+                    border: '1px solid #ddd',
+                    fontSize: '1rem',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <i className="fas fa-tags" style={{
+                  position: 'absolute',
+                  left: '15px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#666'
+                }}></i>
+                {categorySearchTerm && (
+                  <button 
+                    onClick={() => setCategorySearchTerm('')}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#666',
+                      cursor: 'pointer',
+                      fontSize: '1.2rem'
+                    }}
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            </div>
+            <button 
+              onClick={() => {
+                setShowLocationResults(false);
+                setLocationQuery('');
+              }}
+              className="back-to-services"
+            >
+              <i className="fas fa-arrow-left"></i> Back to All Services
+            </button>
           </div>
           
           <div className="providers-grid">
-            {matchingProviders.map(provider => (
+            {(() => {
+              // First filter by category
+              let filteredProviders = matchingProviders.filter(provider => {
+                if (!categorySearchTerm) return true;
+                const providerCategory = getServiceCategory(provider.serviceId, provider).toLowerCase();
+                return providerCategory.includes(categorySearchTerm.toLowerCase());
+              });
+
+              // Then sort the filtered providers
+              filteredProviders = sortProviders(filteredProviders, sortOption);
+
+              if (filteredProviders.length === 0) {
+                return (
+                  <div key="no-results" className="no-results" style={{
+                    gridColumn: '1 / -1',
+                    textAlign: 'center',
+                    padding: '40px 20px',
+                    color: '#666',
+                    fontSize: '1.1rem'
+                  }}>
+                    <i className="fas fa-search" style={{
+                      fontSize: '2.5rem',
+                      marginBottom: '15px',
+                      color: '#999'
+                    }}></i>
+                    <h3>No service providers found</h3>
+                    <p>We couldn't find any providers matching "{categorySearchTerm}"</p>
+                    <button 
+                      onClick={() => setCategorySearchTerm('')}
+                      style={{
+                        marginTop: '15px',
+                        padding: '8px 20px',
+                        backgroundColor: '#4a90e2',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseOver={(e) => e.target.style.backgroundColor = '#3a7bc8'}
+                      onMouseOut={(e) => e.target.style.backgroundColor = '#4a90e2'}
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                );
+              }
+
+              return filteredProviders.map(provider => (
               <div 
                 key={`${provider.id}-${provider.serviceId || 'unknown'}`}
                 className="provider-card"
@@ -485,8 +364,9 @@ const Services = () => {
                       <h3 className="provider-name" title={provider.name || 'Service Provider'}>
                         {provider.name || 'Service Provider'}
                       </h3>
-                      <p className="provider-title">
-                        {provider.serviceTitle || provider.title || 'Service Professional'}
+                      <p className="provider-category">
+                        <i className="fas fa-tag"></i>
+                        {getServiceCategory(provider.serviceId, provider)}
                       </p>
                       <p className="provider-location">
                         <i className="fas fa-map-marker-alt"></i>
@@ -521,19 +401,9 @@ const Services = () => {
                       className="action-button primary-button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log('Navigating to provider profile:', {
-                          serviceId: provider.serviceId,
-                          providerId: provider.id,
-                          providerName: provider.name
-                        });
                         if (provider.id && provider.serviceId) {
                           navigate(`/provider/${provider.serviceId}/${provider.id}`, {
                             state: { providerData: provider }
-                          });
-                        } else {
-                          console.error('Missing required data for navigation:', {
-                            hasId: !!provider.id,
-                            hasServiceId: !!provider.serviceId
                           });
                         }
                       }}
@@ -575,7 +445,7 @@ const Services = () => {
                           ))}
                         </div>
                         <div className="rating-count">
-                          {provider.reviewCount ? `${provider.reviewCount} ${provider.reviewCount === 1 ? 'review' : 'reviews'}` : 'No reviews yet'}
+                          {provider.reviews ? `${provider.reviews} ${provider.reviews === 1 ? 'review' : 'reviews'}` : 'No reviews yet'}
                         </div>
                       </div>
                     </div>
@@ -605,61 +475,64 @@ const Services = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            ));
+            })()}
           </div>
-          
-          <div className="divider-with-text">
-            <div className="divider-line"></div>
-            <span className="divider-text">OR</span>
-            <div className="divider-line"></div>
-          </div>
-          
-          <h3>Services available in this location:</h3>
-        </>
-      ) : locationQuery.trim() ? (
+        </div>
+      ) : matchingProviders.length === 0 && locationQuery ? (
         <div className="no-providers-message">
           <i className="fas fa-exclamation-circle error-icon"></i>
           <h3>No providers found in "{locationQuery}"</h3>
           <p>Try a different location or check back later for more providers in your area.</p>
+          <button 
+            onClick={() => {
+              setShowLocationResults(false);
+              setLocationQuery('');
+            }}
+            className="back-to-services"
+          >
+            <i className="fas fa-arrow-left"></i> Back to All Services
+          </button>
         </div>
       ) : null}
       
-      <div className="services-grid">
-        {filteredServices.length > 0 ? (
-          filteredServices.map(service => (
-            <div 
-              className="service-card" 
-              key={service.id}
-              onClick={() => handleServiceClick(service.id)}
-
-            >
-              <div className="service-icon">{service.icon}</div>
-              <h3>{service.title}</h3>
-              <p>{service.description}</p>
-              <div className="service-tags">
-                {service.tags.map((tag, index) => (
-                  <span key={index} className="tag">{tag}</span>
-                ))}
+      {!showLocationResults && (
+        <div className="services-grid">
+          {filteredServices.length > 0 ? (
+            filteredServices.map(service => (
+              <div 
+                className="service-card" 
+                key={service.id}
+                onClick={() => handleServiceClick(service.id)}
+              >
+                <div className="service-icon">{service.icon}</div>
+                <h3>{service.title}</h3>
+                <p>{service.description}</p>
+                <div className="service-tags">
+                  {service.tags.map((tag, index) => (
+                    <span key={index} className="tag">{tag}</span>
+                  ))}
+                </div>
+                <div className="view-providers">
+                  <span>View Providers</span>
+                  <i className="fas fa-arrow-right"></i>
+                </div>
               </div>
-              <div className="view-providers">
-                <span>View Providers</span>
-                <i className="fas fa-arrow-right"></i>
-              </div>
+            ))
+          ) : (
+            <div className="no-results" style={{ 
+              gridColumn: '1 / -1', 
+              textAlign: 'center', 
+              padding: '40px 20px', 
+              color: '#666' 
+            }}>
+              <i className="fas fa-search" style={{ fontSize: '3rem', marginBottom: '20px', opacity: 0.5 }}></i>
+              <h3>No services found{searchTerm ? ` matching "${searchTerm}"` : ''}</h3>
+              <p>Try a different search term or check back later for more services.</p>
             </div>
-          ))
-        ) : (
-          <div className="no-results" style={{ 
-            gridColumn: '1 / -1', 
-            textAlign: 'center', 
-            padding: '40px 20px', 
-            color: '#666' 
-          }}>
-            <i className="fas fa-search" style={{ fontSize: '3rem', marginBottom: '20px', opacity: 0.5 }}></i>
-            <h3>No services found{searchTerm ? ` matching "${searchTerm}"` : ''}</h3>
-            <p>Try a different search term or check back later for more services.</p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

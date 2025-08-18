@@ -8,21 +8,7 @@ const Footer = () => {
         <div className="footer-section">
           <h3>About Us</h3>
           <p>AAA Services Directory is your one-stop platform for discovering and booking professional services across various categories.</p>
-          {/* <div className="social-links">
-            <a href="/" className="social-link">
-              <i className="fab fa-facebook"></i>
-            </a>
-            <a href="/" className="social-link">
-              <i className="fab fa-twitter"></i>
-            </a>
-            <a href="/" className="social-link">
-              <i className="fab fa-instagram"></i>
-            </a>
-            <a href="/" className="social-link">
-              <i className="fab fa-linkedin"></i>
-            </a>
-          </div> */}
-           <div className="nav-links">
+           <div className="nav-links-footer">
                       <Link to="/" className="nav-link"><i className="fab fa-facebook"></i></Link>
                       <Link to="/" className="nav-link"><i className="fab fa-twitter"></i></Link>
                       <Link to="/" className="nav-link"><i className="fab fa-instagram"></i></Link>

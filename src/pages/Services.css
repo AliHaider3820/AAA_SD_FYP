@@ -195,6 +195,25 @@
   gap: 0.5rem;
 }
 
+.provider-card .provider-category {
+  color: #3498db;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  background-color: #f0f7ff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.provider-category i {
+  font-size: 0.8rem;
+  color: #2980b9;
+}
+
 /* Providers Grid */
 .providers-grid {
   display: grid;
@@ -289,13 +308,65 @@
   border-radius: 8px;
   border-left: 4px solid #4a6cf7;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+/* Header title */
+.providers-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+/* Header description */
+.providers-header p {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Location highlight text */
 .location-highlight {
   color: #4a6cf7;
   font-weight: 600;
+}
+
+/* Responsive styles */
+@media (min-width: 768px) {
+  .providers-header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 25px;
+  }
+  
+  .providers-header h3 {
+    margin-right: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .providers-header h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .providers-header {
+    padding: 12px 15px;
+  }
+  
+  .providers-header h3 {
+    font-size: 1rem;
+  }
+  
+  .providers-header p {
+    font-size: 0.9rem;
+  }
 }
 
 /* Divider with Text */

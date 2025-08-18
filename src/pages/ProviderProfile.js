@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import serviceProviders from '../data/serviceProviders';
@@ -22,7 +22,7 @@ const mockProviders = serviceProviders;
 
 const ProviderProfile = () => {
   const { serviceId, providerId } = useParams();
-  const { isAuthenticated } = useAuth();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [provider, setProvider] = useState(null);
@@ -31,7 +31,6 @@ const ProviderProfile = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [newReview, setNewReview] = useState({ name: '', rating: 5, comment: '' });
-  const { currentUser } = useAuth();
   
   // Check for tab=contact in URL when component mounts
   useEffect(() => {
@@ -58,41 +57,49 @@ const ProviderProfile = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      // Ensure providerId is treated as a string for consistent comparison
-      const providerIdStr = String(providerId);
-      const serviceProviders = mockProviders[serviceId] || [];
-      const selectedProvider = serviceProviders.find(p => p.id === parseInt(providerIdStr));
-      
-      if (selectedProvider) {
-        setProvider(selectedProvider);
-        
-        // Load reviews from localStorage
-        const savedReviews = localStorage.getItem('providerReviews');
-        if (savedReviews) {
-          try {
-            const allReviews = JSON.parse(savedReviews);
-            // Ensure we're using the same string key when accessing the reviews
-            const providerReviews = allReviews[providerIdStr] || [];
-            console.log('Loaded reviews:', providerReviews);
-            setReviews(providerReviews);
-          } catch (error) {
-            console.error('Error parsing saved reviews:', error);
-            setReviews([]);
-          }
-        } else {
-          // Fallback to mock reviews if no localStorage data
-          console.log('No saved reviews, using mock data');
-          setReviews(mockReviews[providerIdStr] || []);
-        }
+      setLoading(true);
+      // First check if we have provider data in location state
+      if (location.state?.providerData) {
+        setProvider(location.state.providerData);
+        loadReviews(location.state.providerData.id);
       } else {
-        console.log('Provider not found, redirecting...');
-        navigate('/services');
+        // Fallback to finding provider from mock data if no state is provided
+        const providerIdStr = String(providerId);
+        const serviceProviders = mockProviders[serviceId] || [];
+        const selectedProvider = serviceProviders.find(p => p.id === parseInt(providerIdStr) || p.id === providerIdStr);
+        
+        if (selectedProvider) {
+          setProvider(selectedProvider);
+          loadReviews(selectedProvider.id);
+        } else {
+          console.log('Provider not found, redirecting...');
+          navigate('/services');
+        }
       }
       setLoading(false);
     };
     
+    const loadReviews = (id) => {
+      const savedReviews = localStorage.getItem('providerReviews');
+      if (savedReviews) {
+        try {
+          const allReviews = JSON.parse(savedReviews);
+          const providerReviews = allReviews[id] || [];
+          console.log('Loaded reviews:', providerReviews);
+          setReviews(providerReviews);
+        } catch (error) {
+          console.error('Error parsing saved reviews:', error);
+          setReviews([]);
+        }
+      } else {
+        // Fallback to mock reviews if no localStorage data
+        console.log('No saved reviews, using mock data');
+        setReviews(mockReviews[id] || []);
+      }
+    };
+    
     fetchData();
-  }, [serviceId, providerId, navigate]);
+  }, [serviceId, providerId, navigate, location.state]);
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
@@ -210,7 +217,7 @@ const ProviderProfile = () => {
           <div className="rating">
             <div className="stars">
               {[...Array(5)].map((_, i) => {
-                const starValue = i + 1;
+                // Star rendering logic
                 const isFilled = i < Math.floor(provider.rating);
                 const isHalfFilled = !isFilled && (provider.rating - i > 0.5);
                 

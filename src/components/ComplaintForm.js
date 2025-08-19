@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FaSearch, FaStar } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaStar } from 'react-icons/fa';
 import serviceProviders from '../data/serviceProviders';
 import './ComplaintForm.css';
 
@@ -35,19 +35,36 @@ const ComplaintForm = ({ serviceProviderId, onSubmit, onCancel }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showProviderList, setShowProviderList] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const dropdownRef = useRef(null);
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowCategoryDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
+  const toggleCategoryDropdown = (e) => {
+    e.stopPropagation();
+    setShowCategoryDropdown(prev => !prev);
+  };
 
   // Set service providers from imported data
   useEffect(() => {
     try {
       console.log('Initial service providers data:', serviceProviders);
       
-      // The imported serviceProviders is already in the correct format
-      // Just ensure all IDs are strings for consistency
+      // Process service providers once on component mount
       const formattedProviders = {};
       
       Object.entries(serviceProviders).forEach(([categoryId, providers]) => {
-        // Keep categoryId as string to match the serviceCategories keys
         formattedProviders[categoryId] = providers.map(provider => ({
           ...provider,
           id: provider.id.toString()
@@ -56,13 +73,11 @@ const ComplaintForm = ({ serviceProviderId, onSubmit, onCancel }) => {
       
       console.log('Formatted providers:', formattedProviders);
       setServiceProvidersData(formattedProviders);
-      setIsLoading(false);
     } catch (err) {
       console.error('Error loading service providers:', err);
       setError('Failed to load service providers. Please try again later.');
-      setIsLoading(false);
     }
-  }, [serviceProviders]); // Add serviceProviders to dependency array
+  }, []); // Empty dependency array since we only want to run this once on mount
   
   // Filter providers based on search query
   useEffect(() => {
@@ -169,16 +184,16 @@ const ComplaintForm = ({ serviceProviderId, onSubmit, onCancel }) => {
         {!serviceProviderId && (
           <div className="form-group">
             <label>Select Service Category</label>
-            <div className="dropdown">
+            <div className="dropdown" ref={dropdownRef}>
               <div 
-                className="dropdown-toggle" 
-                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                className="dropdown-toggle form-control" 
+                onClick={toggleCategoryDropdown}
               >
                 {selectedCategory ? serviceCategories[selectedCategory] : 'Select a category'}
-                <span className="dropdown-arrow">▼</span>
+                <span className={`dropdown-arrow ${showCategoryDropdown ? 'open' : ''}`}>▼</span>
               </div>
               {showCategoryDropdown && (
-                <div className="dropdown-menu">
+                <div className="dropdown-menu show">
                   {Object.entries(serviceCategories).map(([id, name]) => {
                     const hasProviders = serviceProvidersData[id] && serviceProvidersData[id].length > 0;
                     return (

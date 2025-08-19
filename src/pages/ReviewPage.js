@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStar, FaArrowLeft } from 'react-icons/fa';
 import { toast } from 'react-toastify';
@@ -19,8 +19,27 @@ const ReviewPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [reviewerName, setReviewerName] = useState('');
+  const dropdownRef = useRef(null);
   
- 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowCategoryDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const toggleCategoryDropdown = (e) => {
+    e.stopPropagation();
+    setShowCategoryDropdown(prev => !prev);
+  };
+  
   const serviceCategories = {
     1: 'Plumbing Services',
     2: 'Electrical Work',
@@ -45,7 +64,6 @@ const ReviewPage = () => {
   };
   
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
   
   useEffect(() => {
@@ -176,10 +194,6 @@ const handleSubmit = async (e) => {
 
 
 
-  const handleProviderChange = (e) => {
-    setSelectedProvider(e.target.value);
-  };
-
   return (
     <div className="review-page">
       <button className="back-button" onClick={() => navigate(-1)}>
@@ -197,16 +211,16 @@ const handleSubmit = async (e) => {
        
           <div className="form-group">
             <label>Select Service Category</label>
-            <div className="dropdown">
+            <div className="dropdown" ref={dropdownRef}>
               <div 
                 className="dropdown-toggle form-control" 
-                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                onClick={toggleCategoryDropdown}
               >
                 {selectedCategory ? serviceCategories[selectedCategory] : 'Select a category'}
-                <span className="dropdown-arrow">▼</span>
+                <span className={`dropdown-arrow ${showCategoryDropdown ? 'open' : ''}`}>▼</span>
               </div>
               {showCategoryDropdown && (
-                <div className="dropdown-menu">
+                <div className="dropdown-menu show">
                   {Object.entries(serviceCategories).map(([id, name]) => (
                     <div 
                       key={id} 

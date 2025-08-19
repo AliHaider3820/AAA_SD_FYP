@@ -137,7 +137,8 @@
 .dropdown {
   position: relative;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  z-index: 1000;
 }
 
 .dropdown-toggle {
@@ -149,19 +150,24 @@
   border: 1px solid #ddd;
   border-radius: 6px;
   background-color: #fff;
-  transition: border-color 0.3s;
-  width: 100%;
-  text-align: left;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10;
 }
 
 .dropdown-toggle:hover {
-  border-color: #999;
+  border-color: #4a6cf7;
+  box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.1);
 }
 
 .dropdown-arrow {
   margin-left: 10px;
-  font-size: 12px;
-  transition: transform 0.3s;
+  font-size: 10px;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
 }
 
 .dropdown-menu {
@@ -172,11 +178,24 @@
   max-height: 300px;
   overflow-y: auto;
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  margin-top: 5px;
+  z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-5px);
+  transition: all 0.2s ease;
+  margin-top: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .dropdown-item {
@@ -350,7 +369,50 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
+  .dropdown {
+    position: relative;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 0;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid transparent;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    box-shadow: none;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    margin-top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+  }
+  
+  .dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    max-height: 300px;
+    border-color: #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    overflow-y: auto;
+  }
+  
+  .dropdown-toggle {
+    position: relative;
+    z-index: 10;
+  }
+  
   .complaint-form-container {
     padding: 1.5rem;
   }
